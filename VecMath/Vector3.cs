@@ -13,6 +13,8 @@ namespace VecMath
         public static readonly Vector3 UnitY = new Vector3(0, 1, 0);
         public static readonly Vector3 UnitZ = new Vector3(0, 0, 1);
 
+        private const float EPS = 1.0e-7F;
+
         public float x;
         public float y;
         public float z;
@@ -45,6 +47,27 @@ namespace VecMath
             y = v1.z * v2.x - v1.x * v2.z,
             z = v1.x * v2.y - v1.y * v2.x
         };
+
+        public static Vector3 Interpolate(Vector3 v1, Vector3 v2, float t)
+        {
+            float dot = v1 * v2;
+            float t1, t2;
+
+            if (1.0F - dot > EPS)
+            {
+                float angle = (float)Math.Acos(v1 * v2);
+                float sin = (float)Math.Sin(angle);
+                t1 = (float)Math.Sin(angle * (1 - t)) / sin;
+                t2 = (float)Math.Sin(angle * t) / sin;
+            }
+            else
+            {
+                t1 = t;
+                t2 = 1 - t;
+            }
+
+            return t1 * v1 + t2 * v2;
+        }
 
         public static Vector3 Normalize(Vector3 v1)
         {
@@ -85,6 +108,8 @@ namespace VecMath
             if ((diff < 0 ? -diff : diff) > epsilon) return false;
             return true;
         }
+
+        public bool IsNaN() => float.IsNaN(x) || float.IsNaN(y) || float.IsNaN(z);
 
         public float Length() => (float)Math.Sqrt(x * x + y * y + z * z);
 

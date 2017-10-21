@@ -110,6 +110,10 @@ namespace VecMath
 
         public static explicit operator DxMath.Vector4(Vector4 v1) => new DxMath.Vector4(v1.x, v1.y, v1.z, v1.w);
 
+        public static explicit operator OpenTK.Vector4(Vector4 v1) => new OpenTK.Vector4(v1.x, v1.y, v1.z, v1.w);
+
         public static implicit operator Vector4(DxMath.Vector4 v1) => new Vector4(v1.X, v1.Y, v1.Z, v1.W);
+
+        public static implicit operator Vector4(OpenTK.Vector4 v1) => new Vector4(v1.X, v1.Y, v1.Z, v1.W);
     }
 }

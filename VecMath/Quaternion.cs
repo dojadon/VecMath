@@ -152,7 +152,7 @@ namespace VecMath
 
         public static Quaternion Pow(Quaternion q1, float exponent)
         {
-            if (Math.Abs(q1.w) > 1 - EPS) { return Identity; }
+            if (Math.Abs(q1.w) > 1 - EPS || exponent < EPS) { return Identity; }
 
             float angle1 = (float)Math.Acos(q1.w);
             float angle2 = angle1 * exponent;
@@ -208,10 +208,17 @@ namespace VecMath
 
         public static Vector3 RotateVector(Vector3 v1, Quaternion q1)
         {
+            if (v1 == Vector3.Zero)
+            {
+                return Vector3.Zero;
+            }
             var q2 = ~q1 * new Quaternion(v1.x, v1.y, v1.z, 0) * q1;
 
             return new Vector3(q2.x, q2.y, q2.z);
         }
+
+        public bool IsNaN() => float.IsNaN(x) || float.IsNaN(y) || float.IsNaN(z) || float.IsNaN(w);
+
 
         public override bool Equals(object obj)
         {
