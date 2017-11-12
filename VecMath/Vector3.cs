@@ -39,7 +39,16 @@ namespace VecMath
 
         public static Vector3 Scale(Vector3 v1, Vector3 v2) => new Vector3(v1.x * v2.x, v1.y * v2.y, v1.z * v2.z);
 
+        public static Vector3 Pow(Vector3 v1, float f1) => new Vector3((float)Math.Pow(v1.x, f1), (float)Math.Pow(v1.y, f1), (float)Math.Pow(v1.z, f1));
+
         public static float Dot(Vector3 v1, Vector3 v2) => v2.x * v1.x + v2.y * v1.y + v2.z * v1.z;
+
+        public static Vector3 Clamp(Vector3 v, Vector3 min, Vector3 max) => new Vector3()
+        {
+            x = v.x < min.x ? min.x : (max.x < v.x ? max.x : v.x),
+            y = v.y < min.y ? min.y : (max.y < v.y ? max.y : v.y),
+            z = v.z < min.z ? min.z : (max.z < v.z ? max.z : v.z),
+        };
 
         public static Vector3 Cross(Vector3 v1, Vector3 v2) => new Vector3()
         {
@@ -67,6 +76,61 @@ namespace VecMath
             }
 
             return t1 * v1 + t2 * v2;
+        }
+
+        public static Vector3 RotationEularMatrixZXY(Matrix3 m)
+        {
+            Vector3 eular = Zero;
+            double sinX = m.m21;
+
+            eular.x = (float)Math.Asin(sinX);
+
+            if (-1 < sinX && sinX < 1)
+            {
+                double cosX = Math.Cos(eular.x);
+
+                double cosY = m.m22 / cosX;
+                double sinY = m.m21 / -cosX;
+                eular.y = (float)Math.Atan2(sinY, cosY);
+
+                double cosZ = m.m11 / cosX;
+                double sinZ = m.m01 / -cosX;
+                eular.z = (float)Math.Atan2(sinZ, cosZ);
+            }
+            else
+            {
+                eular.z = (float)Math.Atan2(m.m10, m.m00);
+            }
+            return eular;
+        }
+
+        public static Vector3 RotationEularMatrixXZY(Matrix3 m)
+        {
+            Vector3 eular = Zero;
+
+            double sinZ = -m.m01;
+            eular.z = (float)Math.Asin(sinZ);
+
+            if (-1 < sinZ && sinZ < 1)
+            {
+                double cosZ = Math.Cos(eular.z);
+
+                double sinY = m.m02 / cosZ;
+                double cosY = m.m00 / cosZ;
+                eular.y = (float)Math.Atan2(sinY, cosY);
+
+                double sinX = m.m21 / cosZ;
+                double cosX = m.m11 / cosZ;
+                eular.x = (float)Math.Atan2(sinX, cosX);
+            }
+            else
+            {
+                double sinX = -m.m20;
+                double cosX = -m.m10;
+                eular.x = (float)Math.Atan2(sinX, cosX);
+            }
+
+            return eular;
         }
 
         public static Vector3 Normalize(Vector3 v1)
@@ -133,6 +197,8 @@ namespace VecMath
 
         public static Vector3 operator *(double d1, Vector3 v1) => Scale(v1, (float)d1);
 
+        public static Vector3 operator ^(Vector3 v1, double d1) => Pow(v1, (float)d1);
+
         public static float operator *(Vector3 v1, Vector3 v2) => Dot(v1, v2);
 
         public static Vector3 operator ^(Vector3 v1, Vector3 v2) => Cross(v1, v2);
@@ -143,11 +209,7 @@ namespace VecMath
 
         public static explicit operator DxMath.Vector3(Vector3 v1) => new DxMath.Vector3(v1.x, v1.y, v1.z);
 
-        public static explicit operator OpenTK.Vector3(Vector3 v1) => new OpenTK.Vector3(v1.x, v1.y, v1.z);
-
         public static implicit operator Vector3(DxMath.Vector3 v1) => new Vector3(v1.X, v1.Y, v1.Z);
-
-        public static implicit operator Vector3(OpenTK.Vector3 v1) => new Vector3(v1.X, v1.Y, v1.Z);
 
         public static explicit operator float[] (Vector3 v1) => new float[] { v1.x, v1.y, v1.z };
 

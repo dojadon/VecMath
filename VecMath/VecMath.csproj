@@ -33,9 +33,6 @@
     <Reference Include="DxMath">
       <HintPath>..\..\..\..\..\..\..\tool\model\MikuMikuMoving64_v1272\System\x64\DxMath.dll</HintPath>
     </Reference>
-    <Reference Include="OpenTK">
-      <HintPath>..\..\GLSharp5.4.3_OpenTK1.0\OpenTK_bin\Release\OpenTK.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

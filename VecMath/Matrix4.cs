@@ -108,6 +108,10 @@ namespace VecMath
             return m1;
         }
 
+        public static Matrix4 Scale(Vector3 scale) => new Matrix4(scale.x, 0, 0, 0, 0, scale.y, 0, 0, 0, 0, scale.z, 0, 0, 0, 0, 1);
+
+        public static Matrix4 Scale(float x, float y, float z) => new Matrix4(x, 0, 0, 0, 0, y, 0, 0, 0, 0, z, 0, 0, 0, 0, 1);
+
         public static Matrix4 RotationAxis(Vector3 axis, float angle, Vector3? trans = null)
         {
             float cos = (float)Math.Cos(angle);
@@ -128,56 +132,6 @@ namespace VecMath
             return new Matrix4(x, y, z, trans ?? Vector3.Zero);
         }
 
-        public static Matrix4 Perspective(float fovy, float aspect, float zNear, float zFar)
-        {
-            float yMax = zNear * (float)System.Math.Tan(0.5f * fovy);
-            float yMin = -yMax;
-            float xMin = yMin * aspect;
-            float xMax = yMax * aspect;
-
-            return PerspectiveOffCenter(xMin, xMax, yMin, yMax, zNear, zFar);
-        }
-
-        public static Matrix4 PerspectiveOffCenter(float left, float right, float bottom, float top, float zNear, float zFar)
-        {
-            if (zNear <= 0)
-                throw new ArgumentOutOfRangeException("zNear");
-            if (zFar <= 0)
-                throw new ArgumentOutOfRangeException("zFar");
-            if (zNear >= zFar)
-                throw new ArgumentOutOfRangeException("zNear");
-
-            float x = (2.0f * zNear) / (right - left);
-            float y = (2.0f * zNear) / (top - bottom);
-            float a = (right + left) / (right - left);
-            float b = (top + bottom) / (top - bottom);
-            float c = -(zFar + zNear) / (zFar - zNear);
-            float d = -(2.0f * zFar * zNear) / (zFar - zNear);
-
-            return new Matrix4()
-            {
-                m00 = x,
-                m01 = 0,
-                m02 = 0,
-                m03 = 0,
-
-                m10 = 0,
-                m11 = y,
-                m12 = 0,
-                m13 = 0,
-
-                m20 = a,
-                m21 = b,
-                m22 = c,
-                m23 = -1,
-
-                m30 = x,
-                m31 = 0,
-                m32 = d,
-                m33 = 0,
-            };
-        }
-
         public static Matrix4 LookAt(Vector3 forward, Vector3 upward, Vector3? trans = null)
         {
             var z = -forward;
@@ -185,17 +139,6 @@ namespace VecMath
             var y = +(z ^ x);
 
             return new Matrix4(x, y, z, trans ?? Vector3.Zero);
-        }
-
-        public static Matrix4 LookAtCenter(Vector3 center, Vector3 eye, Vector3 upward)
-        {
-            var z = +(eye - center);
-            var x = +(upward ^ z);
-            var y = +(z ^ x);
-
-            var mat = new Matrix3(x, y, z);
-
-            return SetTranslation(mat, eye * mat);
         }
 
         public static Matrix4 Mul(Matrix4 m1, Matrix4 m2) => new Matrix4()
@@ -353,46 +296,6 @@ namespace VecMath
         public static implicit operator Matrix4(Matrix3 m) => new Matrix4(m);
 
         public static implicit operator Matrix4(Quaternion q1) => new Matrix4(q1);
-
-        public static explicit operator OpenTK.Matrix4(Matrix4 m) => new OpenTK.Matrix4()
-        {
-            M11 = m.m00,
-            M12 = m.m01,
-            M13 = m.m02,
-            M14 = m.m03,
-            M21 = m.m10,
-            M22 = m.m11,
-            M23 = m.m12,
-            M24 = m.m13,
-            M31 = m.m20,
-            M32 = m.m21,
-            M33 = m.m22,
-            M34 = m.m23,
-            M41 = m.m30,
-            M42 = m.m31,
-            M43 = m.m32,
-            M44 = m.m33,
-        };
-
-        public static implicit operator Matrix4(OpenTK.Matrix4 m) => new Matrix4()
-        {
-            m00 = m.M11,
-            m01 = m.M12,
-            m02 = m.M13,
-            m03 = m.M14,
-            m10 = m.M21,
-            m11 = m.M22,
-            m12 = m.M23,
-            m13 = m.M24,
-            m20 = m.M31,
-            m21 = m.M32,
-            m22 = m.M33,
-            m23 = m.M34,
-            m30 = m.M41,
-            m31 = m.M42,
-            m32 = m.M43,
-            m33 = m.M44,
-        };
 
         public static explicit operator float[] (Matrix4 m)
         {

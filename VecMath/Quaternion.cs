@@ -138,16 +138,34 @@ namespace VecMath
             else
             {
                 amag = 1.0F / amag;
-                float mag = (float)Math.Sin(angle / 2.0);
+                float mag = (float)Math.Sin(angle * 0.5);
 
                 return new Quaternion()
                 {
-                    w = (float)Math.Cos(angle / 2.0),
+                    w = (float)Math.Cos(angle * 0.5),
                     x = a.x * amag * mag,
                     y = a.y * amag * mag,
                     z = a.z * amag * mag
                 };
             }
+        }
+
+        public static Quaternion RotationEularZXY(Vector3 eular)
+        {
+            var x = RotationAxis(Vector3.UnitX, eular.x);
+            var y = RotationAxis(Vector3.UnitY, eular.y);
+            var z = RotationAxis(Vector3.UnitZ, eular.z);
+
+            return z * x * y;
+        }
+
+        public static Quaternion RotationEularXZY(Vector3 eular)
+        {
+            var x = RotationAxis(Vector3.UnitX, eular.x);
+            var y = RotationAxis(Vector3.UnitY, eular.y);
+            var z = RotationAxis(Vector3.UnitZ, eular.z);
+
+            return x * z * y;
         }
 
         public static Quaternion Pow(Quaternion q1, float exponent)
@@ -219,7 +237,6 @@ namespace VecMath
 
         public bool IsNaN() => float.IsNaN(x) || float.IsNaN(y) || float.IsNaN(z) || float.IsNaN(w);
 
-
         public override bool Equals(object obj)
         {
             if (obj is Quaternion q)
@@ -261,7 +278,7 @@ namespace VecMath
 
         public static bool operator ==(Quaternion q1, Quaternion q2) => q1.x == q2.x && q1.y == q2.y && q1.z == q2.z && q1.w == q2.w;
 
-        public static bool operator !=(Quaternion q1, Quaternion q2) => (q1.x == q2.x && q1.y == q2.y && q1.z == q2.z && q1.w == q2.w);
+        public static bool operator !=(Quaternion q1, Quaternion q2) => !(q1.x == q2.x && q1.y == q2.y && q1.z == q2.z && q1.w == q2.w);
 
         public static Quaternion operator +(Quaternion q1) => Normalize(q1);
 

@@ -58,6 +58,10 @@ namespace VecMath
 
         public Matrix3(Matrix4 m) : this(m.m00, m.m01, m.m02, m.m10, m.m11, m.m12, m.m20, m.m21, m.m22) { }
 
+        public static Matrix3 Scale(Vector3 s) => new Matrix3(s.x, 0, 0, 0, s.y, 0, 0, 0, s.z);
+
+        public static Matrix3 Scale(float x, float y, float z) => new Matrix3(x, 0, 0, 0, y, 0, 0, 0, z);
+
         public static Matrix3 RotationAxis(Vector3 axis, float angle)
         {
             float cos = (float)Math.Cos(angle);
