@@ -108,11 +108,9 @@ namespace VecMath
             return m1;
         }
 
-        public static Matrix4 Scale(Vector3 scale) => new Matrix4(scale.x, 0, 0, 0, 0, scale.y, 0, 0, 0, 0, scale.z, 0, 0, 0, 0, 1);
+        public static Matrix4 RotationAxis(Vector3 axis, float angle) => RotationAxis(axis, angle, Vector3.Zero);
 
-        public static Matrix4 Scale(float x, float y, float z) => new Matrix4(x, 0, 0, 0, 0, y, 0, 0, 0, 0, z, 0, 0, 0, 0, 1);
-
-        public static Matrix4 RotationAxis(Vector3 axis, float angle, Vector3? trans = null)
+        public static Matrix4 RotationAxis(Vector3 axis, float angle, Vector3 trans)
         {
             float cos = (float)Math.Cos(angle);
             float sin = (float)Math.Sin(angle);
@@ -129,16 +127,18 @@ namespace VecMath
             n = axis.z * axis;
             z = cos * (z - n) + sin * (axis ^ z) + n;
 
-            return new Matrix4(x, y, z, trans ?? Vector3.Zero);
+            return new Matrix4(x, y, z, trans);
         }
 
-        public static Matrix4 LookAt(Vector3 forward, Vector3 upward, Vector3? trans = null)
+        public static Matrix4 LookAt(Vector3 forward, Vector3 upward) => LookAt(forward, upward, Vector3.Zero);
+
+        public static Matrix4 LookAt(Vector3 forward, Vector3 upward, Vector3 trans)
         {
             var z = -forward;
             var x = +(upward ^ z);
             var y = +(z ^ x);
 
-            return new Matrix4(x, y, z, trans ?? Vector3.Zero);
+            return new Matrix4(x, y, z, trans);
         }
 
         public static Matrix4 Mul(Matrix4 m1, Matrix4 m2) => new Matrix4()
@@ -166,8 +166,8 @@ namespace VecMath
 
         public static Matrix4 Inverse(Matrix4 m1)
         {
-            var rot = ~m1.Rotation;
-            return SetTranslation(rot, -m1.Translation * rot);
+            var inv = ~m1.Rotation;
+            return SetTranslation(inv, -m1.Translation * inv);
         }
 
         public static Matrix4 Transpose(Matrix4 m1) => new Matrix4()
@@ -208,64 +208,18 @@ namespace VecMath
             z = v1.x * m1.m02 + v1.y * m1.m12 + v1.z * m1.m22
         };
 
-        public static Matrix4 Leap(Matrix4 m1, Matrix4 m2, float weight) => new Matrix4()
-        {
-            m00 = m1.m00 * weight + m2.m00 * (1 - weight),
-            m01 = m1.m01 * weight + m2.m01 * (1 - weight),
-            m02 = m1.m02 * weight + m2.m02 * (1 - weight),
-            m03 = m1.m03 * weight + m2.m03 * (1 - weight),
-
-            m10 = m1.m10 * weight + m2.m10 * (1 - weight),
-            m11 = m1.m11 * weight + m2.m11 * (1 - weight),
-            m12 = m1.m12 * weight + m2.m12 * (1 - weight),
-            m13 = m1.m13 * weight + m2.m13 * (1 - weight),
-
-            m20 = m1.m20 * weight + m2.m20 * (1 - weight),
-            m21 = m1.m21 * weight + m2.m21 * (1 - weight),
-            m22 = m1.m22 * weight + m2.m22 * (1 - weight),
-            m23 = m1.m23 * weight + m2.m23 * (1 - weight),
-
-            m30 = m1.m30 * weight + m2.m30 * (1 - weight),
-            m31 = m1.m31 * weight + m2.m31 * (1 - weight),
-            m32 = m1.m32 * weight + m2.m32 * (1 - weight),
-            m33 = m1.m33 * weight + m2.m33 * (1 - weight),
-        };
-
-        public static Matrix4 Leap(Matrix4 m1, Matrix4 m2, Matrix4 m3, Matrix4 m4, float[] weight) => new Matrix4()
-        {
-            m00 = m1.m00 * weight[0] + m2.m00 * weight[1] + m3.m00 * weight[2] + m4.m00 * weight[3],
-            m01 = m1.m01 * weight[0] + m2.m01 * weight[1] + m3.m01 * weight[2] + m4.m01 * weight[3],
-            m02 = m1.m02 * weight[0] + m2.m02 * weight[1] + m3.m02 * weight[2] + m4.m02 * weight[3],
-            m03 = m1.m03 * weight[0] + m2.m03 * weight[1] + m3.m03 * weight[2] + m4.m03 * weight[3],
-
-            m10 = m1.m10 * weight[0] + m2.m10 * weight[1] + m3.m10 * weight[2] + m4.m10 * weight[3],
-            m11 = m1.m11 * weight[0] + m2.m11 * weight[1] + m3.m11 * weight[2] + m4.m11 * weight[3],
-            m12 = m1.m12 * weight[0] + m2.m12 * weight[1] + m3.m12 * weight[2] + m4.m12 * weight[3],
-            m13 = m1.m13 * weight[0] + m2.m13 * weight[1] + m3.m13 * weight[2] + m4.m13 * weight[3],
-
-            m20 = m1.m20 * weight[0] + m2.m20 * weight[1] + m3.m20 * weight[2] + m4.m20 * weight[3],
-            m21 = m1.m21 * weight[0] + m2.m21 * weight[1] + m3.m21 * weight[2] + m4.m21 * weight[3],
-            m22 = m1.m22 * weight[0] + m2.m22 * weight[1] + m3.m22 * weight[2] + m4.m22 * weight[3],
-            m23 = m1.m23 * weight[0] + m2.m23 * weight[1] + m3.m23 * weight[2] + m4.m23 * weight[3],
-
-            m30 = m1.m30 * weight[0] + m2.m30 * weight[1] + m3.m30 * weight[2] + m4.m30 * weight[3],
-            m31 = m1.m31 * weight[0] + m2.m31 * weight[1] + m3.m31 * weight[2] + m4.m31 * weight[3],
-            m32 = m1.m32 * weight[0] + m2.m32 * weight[1] + m3.m32 * weight[2] + m4.m32 * weight[3],
-            m33 = m1.m33 * weight[0] + m2.m33 * weight[1] + m3.m33 * weight[2] + m4.m33 * weight[3],
-        };
-
         public override string ToString()
         {
             var sb = new StringBuilder();
 
             sb.Append("[");
-            sb.Append(this.m00).Append(", ").Append(this.m01).Append(", ").Append(this.m02).Append(", ").Append(this.m03);
+            sb.Append(m00).Append(", ").Append(m01).Append(", ").Append(m02).Append(", ").Append(m03);
             sb.Append("]\n[");
-            sb.Append(this.m10).Append(", ").Append(this.m11).Append(", ").Append(this.m12).Append(", ").Append(this.m13);
+            sb.Append(m10).Append(", ").Append(m11).Append(", ").Append(m12).Append(", ").Append(m13);
             sb.Append("]\n[");
-            sb.Append(this.m20).Append(", ").Append(this.m21).Append(", ").Append(this.m22).Append(", ").Append(this.m23);
+            sb.Append(m20).Append(", ").Append(m21).Append(", ").Append(m22).Append(", ").Append(m23);
             sb.Append("]\n[");
-            sb.Append(this.m30).Append(", ").Append(this.m31).Append(", ").Append(this.m32).Append(", ").Append(this.m33);
+            sb.Append(m30).Append(", ").Append(m31).Append(", ").Append(m32).Append(", ").Append(m33);
             sb.Append("]");
 
             return sb.ToString();

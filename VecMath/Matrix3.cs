@@ -58,10 +58,6 @@ namespace VecMath
 
         public Matrix3(Matrix4 m) : this(m.m00, m.m01, m.m02, m.m10, m.m11, m.m12, m.m20, m.m21, m.m22) { }
 
-        public static Matrix3 Scale(Vector3 s) => new Matrix3(s.x, 0, 0, 0, s.y, 0, 0, 0, s.z);
-
-        public static Matrix3 Scale(float x, float y, float z) => new Matrix3(x, 0, 0, 0, y, 0, 0, 0, z);
-
         public static Matrix3 RotationAxis(Vector3 axis, float angle)
         {
             float cos = (float)Math.Cos(angle);
@@ -104,19 +100,6 @@ namespace VecMath
             m20 = m1.m20 * m2.m00 + m1.m21 * m2.m10 + m1.m22 * m2.m20,
             m21 = m1.m20 * m2.m01 + m1.m21 * m2.m11 + m1.m22 * m2.m21,
             m22 = m1.m20 * m2.m02 + m1.m21 * m2.m12 + m1.m22 * m2.m22,
-        };
-
-        public static Matrix3 Mul(Matrix3 m, float f) => new Matrix3()
-        {
-            m00 = m.m00 * f,
-            m01 = m.m01 * f,
-            m02 = m.m02 * f,
-            m10 = m.m10 * f,
-            m11 = m.m11 * f,
-            m12 = m.m12 * f,
-            m20 = m.m20 * f,
-            m21 = m.m21 * f,
-            m22 = m.m22 * f,
         };
 
         public static Matrix3 Pow(Matrix3 m, float exponent)
@@ -188,8 +171,6 @@ namespace VecMath
         public static Matrix3 operator ~(Matrix3 m1) => Inverse(m1);
 
         public static Matrix3 operator *(Matrix3 m1, Matrix3 m2) => Mul(m1, m2);
-
-        public static Matrix3 operator *(Matrix3 m1, float f1) => Mul(m1, f1);
 
         public static Vector3 operator *(Vector3 v1, Matrix3 m1) => Transform(v1, m1);
 

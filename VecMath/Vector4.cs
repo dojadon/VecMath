@@ -26,41 +26,20 @@ namespace VecMath
 
         }
 
-        public static Vector4 Add(Vector4 v1, Vector4 v2) => new Vector4()
-        {
-            x = v1.x + v2.x,
-            y = v1.y + v2.y,
-            z = v1.z + v2.z,
-            w = v1.w + v2.w
-        };
+        public static Vector4 Add(Vector4 v1, Vector4 v2) => new Vector4(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z, v1.w + v2.w);
 
-        public static Vector4 Sub(Vector4 v1, Vector4 v2) => new Vector4()
-        {
-            x = v1.x - v2.x,
-            y = v1.y - v2.y,
-            z = v1.z - v2.z,
-            w = v1.w - v2.w
-        };
+        public static Vector4 Sub(Vector4 v1, Vector4 v2) => new Vector4(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z, v1.w - v2.w);
 
-        public static Vector4 Scale(Vector4 v1, float d1) => new Vector4()
-        {
-            x = v1.x * d1,
-            y = v1.y * d1,
-            z = v1.z * d1,
-            w = v1.w * d1
-        };
+        public static Vector4 Scale(Vector4 v1, float d1) => new Vector4(v1.x * d1, v1.y * d1, v1.z * d1, v1.w * d1);
 
-        public static float Dot(Vector4 v1, Vector4 v2)
-        {
-            return v2.x * v1.x + v2.y * v1.y + v2.z * v1.z + v1.w * v2.w;
-        }
+        public static float Dot(Vector4 v1, Vector4 v2) => v2.x * v1.x + v2.y * v1.y + v2.z * v1.z + v1.w * v2.w;
 
         public static Vector4 Normalize(Vector4 v1)
         {
             float len = v1.Length();
             float mult = len != 1.0 && len != 0.0 ? 1.0F / len : 1.0F;
 
-            return new Vector4(v1.x * mult, v1.y * mult, v1.z * mult, v1.w * mult);
+            return v1 * mult;
         }
 
         public float Length() => (float)Math.Sqrt(x * x + y * y + z * z + w * w);
@@ -75,6 +54,20 @@ namespace VecMath
         }
 
         public bool Equals(Vector4 v1) => v1.x == x && v1.y == y && v1.z == z && v1.w == w;
+
+        public static bool EpsilonEquals(Vector4 v1, Vector4 v2, float epsilon)
+        {
+            float diff;
+            diff = v1.x - v2.x;
+            if ((diff < 0 ? -diff : diff) > epsilon) return false;
+            diff = v1.y - v2.y;
+            if ((diff < 0 ? -diff : diff) > epsilon) return false;
+            diff = v1.z - v2.z;
+            if ((diff < 0 ? -diff : diff) > epsilon) return false;
+            diff = v1.w - v2.w;
+            if ((diff < 0 ? -diff : diff) > epsilon) return false;
+            return true;
+        }
 
         public override int GetHashCode()
         {
@@ -100,13 +93,11 @@ namespace VecMath
 
         public static Vector4 operator -(Vector4 v1, Vector4 v2) => Sub(v1, v2);
 
-        public static Vector4 operator *(Vector4 v1, float d1) => Scale(v1, d1);
+        public static Vector4 operator *(Vector4 v1, double d1) => Scale(v1, (float)d1);
 
-        public static Vector4 operator *(float d1, Vector4 v1) => Scale(v1, d1);
+        public static Vector4 operator *(double d1, Vector4 v1) => Scale(v1, (float)d1);
 
         public static float operator *(Vector4 v1, Vector4 v2) => Dot(v1, v2);
-
-        public static Vector4 operator /(Vector4 v1, float d1) => Scale(v1, 1.0F / d1);
 
         public static explicit operator DxMath.Vector4(Vector4 v1) => new DxMath.Vector4(v1.x, v1.y, v1.z, v1.w);
 

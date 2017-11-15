@@ -118,13 +118,7 @@ namespace VecMath
         {
             float norm = 1.0F / (float)Math.Sqrt(q1.x * q1.x + q1.y * q1.y + q1.z * q1.z + q1.w * q1.w);
 
-            return new Quaternion()
-            {
-                x = norm * q1.x,
-                y = norm * q1.y,
-                z = norm * q1.z,
-                w = norm * q1.w
-            };
+            return new Quaternion(norm * q1.x, norm * q1.y, norm * q1.z, norm * q1.w);
         }
 
         public static Quaternion RotationAxis(Vector3 a, float angle)
@@ -148,24 +142,6 @@ namespace VecMath
                     z = a.z * amag * mag
                 };
             }
-        }
-
-        public static Quaternion RotationEularZXY(Vector3 eular)
-        {
-            var x = RotationAxis(Vector3.UnitX, eular.x);
-            var y = RotationAxis(Vector3.UnitY, eular.y);
-            var z = RotationAxis(Vector3.UnitZ, eular.z);
-
-            return z * x * y;
-        }
-
-        public static Quaternion RotationEularXZY(Vector3 eular)
-        {
-            var x = RotationAxis(Vector3.UnitX, eular.x);
-            var y = RotationAxis(Vector3.UnitY, eular.y);
-            var z = RotationAxis(Vector3.UnitZ, eular.z);
-
-            return x * z * y;
         }
 
         public static Quaternion Pow(Quaternion q1, float exponent)

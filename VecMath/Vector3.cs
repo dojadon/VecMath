@@ -78,61 +78,6 @@ namespace VecMath
             return t1 * v1 + t2 * v2;
         }
 
-        public static Vector3 RotationEularMatrixZXY(Matrix3 m)
-        {
-            Vector3 eular = Zero;
-            double sinX = m.m21;
-
-            eular.x = (float)Math.Asin(sinX);
-
-            if (-1 < sinX && sinX < 1)
-            {
-                double cosX = Math.Cos(eular.x);
-
-                double cosY = m.m22 / cosX;
-                double sinY = m.m21 / -cosX;
-                eular.y = (float)Math.Atan2(sinY, cosY);
-
-                double cosZ = m.m11 / cosX;
-                double sinZ = m.m01 / -cosX;
-                eular.z = (float)Math.Atan2(sinZ, cosZ);
-            }
-            else
-            {
-                eular.z = (float)Math.Atan2(m.m10, m.m00);
-            }
-            return eular;
-        }
-
-        public static Vector3 RotationEularMatrixXZY(Matrix3 m)
-        {
-            Vector3 eular = Zero;
-
-            double sinZ = -m.m01;
-            eular.z = (float)Math.Asin(sinZ);
-
-            if (-1 < sinZ && sinZ < 1)
-            {
-                double cosZ = Math.Cos(eular.z);
-
-                double sinY = m.m02 / cosZ;
-                double cosY = m.m00 / cosZ;
-                eular.y = (float)Math.Atan2(sinY, cosY);
-
-                double sinX = m.m21 / cosZ;
-                double cosX = m.m11 / cosZ;
-                eular.x = (float)Math.Atan2(sinX, cosX);
-            }
-            else
-            {
-                double sinX = -m.m20;
-                double cosX = -m.m10;
-                eular.x = (float)Math.Atan2(sinX, cosX);
-            }
-
-            return eular;
-        }
-
         public static Vector3 Normalize(Vector3 v1)
         {
             float len = v1.Length();
@@ -142,12 +87,7 @@ namespace VecMath
 
             float mult = 1 / len;
 
-            return new Vector3()
-            {
-                x = v1.x * mult,
-                y = v1.y * mult,
-                z = v1.z * mult
-            };
+            return v1 * mult;
         }
 
         public override bool Equals(object obj)
