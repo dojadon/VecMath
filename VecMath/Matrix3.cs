@@ -78,6 +78,30 @@ namespace VecMath
             return new Matrix3(x, y, z);
         }
 
+        public static Matrix3 RotationX(float angle)
+        {
+            float sin = (float)Math.Sin(angle);
+            float cos = (float)Math.Cos(angle);
+
+            return new Matrix3(1, 0, 0, 0, cos, -sin, 0, sin, cos);
+        }
+
+        public static Matrix3 RotationY(float angle)
+        {
+            float sin = (float)Math.Sin(angle);
+            float cos = (float)Math.Cos(angle);
+
+            return new Matrix3(cos, 0, sin, 0, 1, 0, -sin, 0, cos);
+        }
+
+        public static Matrix3 RotationZ(float angle)
+        {
+            float sin = (float)Math.Sin(angle);
+            float cos = (float)Math.Cos(angle);
+
+            return new Matrix3(cos, -sin, 0, sin, cos, 0, 0, 0, 1);
+        }
+
         public static Matrix3 LookAt(Vector3 forward, Vector3 upward)
         {
             var z = -+forward;
@@ -100,6 +124,21 @@ namespace VecMath
             m20 = m1.m20 * m2.m00 + m1.m21 * m2.m10 + m1.m22 * m2.m20,
             m21 = m1.m20 * m2.m01 + m1.m21 * m2.m11 + m1.m22 * m2.m21,
             m22 = m1.m20 * m2.m02 + m1.m21 * m2.m12 + m1.m22 * m2.m22,
+        };
+
+        public static Matrix3 Mul(Matrix3 m, float f) => new Matrix3()
+        {
+            m00 = m.m00 * f,
+            m01 = m.m01 * f,
+            m02 = m.m02 * f,
+
+            m10 = m.m10 * f,
+            m11 = m.m11 * f,
+            m12 = m.m12 * f,
+
+            m20 = m.m20 * f,
+            m21 = m.m21 * f,
+            m22 = m.m22 * f,
         };
 
         public static Matrix3 Pow(Matrix3 m, float exponent)
@@ -174,7 +213,9 @@ namespace VecMath
 
         public static Vector3 operator *(Vector3 v1, Matrix3 m1) => Transform(v1, m1);
 
-        public static Matrix3 operator ^(Matrix3 m1, float d1) => Pow(m1, d1);
+        public static Matrix3 operator *(Matrix3 m1, double d1) => Mul(m1, (float)d1);
+
+        public static Matrix3 operator ^(Matrix3 m1, double d1) => Pow(m1, (float)d1);
 
         public static implicit operator Matrix3(Quaternion q1) => new Matrix3(q1);
 

@@ -81,6 +81,8 @@ namespace VecMath
             }
         }
 
+        public override string ToString() => $"[{x}, {y}, {z}, {w}]";
+
         public static Vector4 operator -(Vector4 v1) => v1 * -1;
 
         public static Vector4 operator +(Vector4 v1) => Normalize(v1);

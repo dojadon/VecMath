@@ -46,7 +46,6 @@ namespace VecMath
             }
         }
 
-
         public Vector3 Translation
         {
             get => new Vector3(m30, m31, m32);
@@ -96,18 +95,6 @@ namespace VecMath
 
         public Matrix4(Quaternion q) : this(q, Vector3.Zero) { }
 
-        public static Matrix4 SetTranslation(Matrix4 m1, Vector3 trans)
-        {
-            m1.Translation = trans;
-            return m1;
-        }
-
-        public static Matrix4 SetRotation(Matrix4 m1, Matrix3 m2)
-        {
-            m1.Rotation = m2;
-            return m1;
-        }
-
         public static Matrix4 RotationAxis(Vector3 axis, float angle) => RotationAxis(axis, angle, Vector3.Zero);
 
         public static Matrix4 RotationAxis(Vector3 axis, float angle, Vector3 trans)
@@ -130,16 +117,37 @@ namespace VecMath
             return new Matrix4(x, y, z, trans);
         }
 
-        public static Matrix4 LookAt(Vector3 forward, Vector3 upward) => LookAt(forward, upward, Vector3.Zero);
-
-        public static Matrix4 LookAt(Vector3 forward, Vector3 upward, Vector3 trans)
+        public static Matrix4 LookAt(Vector3 center, Vector3 eye, Vector3 upward)
         {
-            var z = -forward;
+            var z = +(eye - center);
             var x = +(upward ^ z);
             var y = +(z ^ x);
 
-            return new Matrix4(x, y, z, trans);
+            return new Matrix4(x, y, z, new Vector3(-x * eye, -y * eye, -z * eye));
         }
+
+        public static Matrix4 Perspective(float width, float height, float zNear, float zFar, float fovy)
+        {
+            float aspect = width / height;
+
+            float top = (float)Math.Tan(fovy) * zNear;
+            float bottom = -top;
+            float left = bottom * aspect;
+            float right = top * aspect;
+
+            return Frustum(left, right, bottom, top, zNear, zFar);
+        }
+
+        public static Matrix4 Frustum(float left, float right, float bottom, float top, float near, float far) => new Matrix4
+        {
+            m00 = 2 * near / (right - left),
+            m02 = (right + left) / (right - left),
+            m11 = 2 * near / (top - bottom),
+            m12 = (top + bottom) / (top - bottom),
+            m22 = -(far + near) / (far - near),
+            m23 = -2 * far * near / (far - near),
+            m32 = -1,
+        };
 
         public static Matrix4 Mul(Matrix4 m1, Matrix4 m2) => new Matrix4()
         {
@@ -164,10 +172,41 @@ namespace VecMath
             m33 = m1.m30 * m2.m03 + m1.m31 * m2.m13 + m1.m32 * m2.m23 + m1.m33 * m2.m33
         };
 
-        public static Matrix4 Inverse(Matrix4 m1)
+        public static Matrix4 InverseOrthonormal(Matrix4 m1)
         {
             var inv = ~m1.Rotation;
-            return SetTranslation(inv, -m1.Translation * inv);
+            return new Matrix4(inv, -m1.Translation * inv);
+        }
+
+        public static Matrix4 Inverse(Matrix4 m1)
+        {
+            float[][] array = (float[][])m1;
+            float[][] invArray = (float[][])Identity;
+
+            float buf;
+
+            for (int i = 0; i < 4; i++)
+            {
+                buf = 1 / array[i][i];
+                for (int j = 0; j < 4; j++)
+                {
+                    array[i][j] *= buf;
+                    invArray[i][j] *= buf;
+                }
+                for (int j = 0; j < 4; j++)
+                {
+                    if (i != j)
+                    {
+                        buf = array[j][i];
+                        for (int k = 0; k < 4; k++)
+                        {
+                            array[j][k] -= array[i][k] * buf;
+                            invArray[j][k] -= invArray[i][k] * buf;
+                        }
+                    }
+                }
+            }
+            return invArray;
         }
 
         public static Matrix4 Transpose(Matrix4 m1) => new Matrix4()
@@ -251,33 +290,13 @@ namespace VecMath
 
         public static implicit operator Matrix4(Quaternion q1) => new Matrix4(q1);
 
-        public static explicit operator float[] (Matrix4 m)
+        public static explicit operator float[] (Matrix4 m) => new[]
         {
-            var result = new float[16];
-
-            int index = 0;
-            result[index++] = m.m00;
-            result[index++] = m.m01;
-            result[index++] = m.m02;
-            result[index++] = m.m03;
-
-            result[index++] = m.m10;
-            result[index++] = m.m11;
-            result[index++] = m.m12;
-            result[index++] = m.m13;
-
-            result[index++] = m.m20;
-            result[index++] = m.m21;
-            result[index++] = m.m22;
-            result[index++] = m.m23;
-
-            result[index++] = m.m30;
-            result[index++] = m.m31;
-            result[index++] = m.m32;
-            result[index++] = m.m33;
-
-            return result;
-        }
+        m.m00, m.m01, m.m02, m.m03,
+        m.m10, m.m11, m.m12, m.m13,
+        m.m20, m.m21, m.m22, m.m23,
+        m.m30, m.m31, m.m32, m.m33
+        };
 
         public static implicit operator Matrix4(float[] src)
         {
@@ -303,6 +322,41 @@ namespace VecMath
                 m31 = src[index++],
                 m32 = src[index++],
                 m33 = src[index++]
+            };
+        }
+
+        public static explicit operator float[][] (Matrix4 m) => new[]
+        {
+        new []{ m.m00, m.m01, m.m02, m.m03 },
+        new []{ m.m10, m.m11, m.m12, m.m13 },
+        new []{ m.m20, m.m21, m.m22, m.m23 },
+        new []{ m.m30, m.m31, m.m32, m.m33 }
+        };
+
+        public static implicit operator Matrix4(float[][] src)
+        {
+            int index1 = 0, index2 = 0;
+            return new Matrix4()
+            {
+                m00 = src[index1][index2++],
+                m01 = src[index1][index2++],
+                m02 = src[index1][index2++],
+                m03 = src[index1++][index2++],
+
+                m10 = src[index1][(index2 = 1) - 1],
+                m11 = src[index1][index2++],
+                m12 = src[index1][index2++],
+                m13 = src[index1++][index2++],
+
+                m20 = src[index1][(index2 = 1) - 1],
+                m21 = src[index1][index2++],
+                m22 = src[index1][index2++],
+                m23 = src[index1++][index2++],
+
+                m30 = src[index1][(index2 = 1) - 1],
+                m31 = src[index1][index2++],
+                m32 = src[index1][index2++],
+                m33 = src[index1++][index2++],
             };
         }
     }
