@@ -19,6 +19,38 @@ namespace VecMath
         public float y;
         public float z;
 
+        public float this[int idx]
+        {
+            get
+            {
+                switch (idx)
+                {
+                    case 0: return x;
+                    case 1: return y;
+                    case 2: return z;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+            set
+            {
+                switch (idx)
+                {
+                    case 0:
+                        x = value;
+                        break;
+                    case 1:
+                        y = value;
+                        break;
+                    case 2:
+                        z = value;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
         public Vector3(float x, float y, float z)
         {
             this.x = x;
@@ -126,8 +158,13 @@ namespace VecMath
         public static Vector3 operator +(Vector3 v1) => Normalize(v1);
 
         public static bool operator ==(Vector3 v1, Vector3 v2) => v1.x == v2.x && v1.y == v2.y && v1.z == v2.z;
-
         public static bool operator !=(Vector3 v1, Vector3 v2) => !(v1.x == v2.x && v1.y == v2.y && v1.z == v2.z);
+
+        public static bool operator <(Vector3 v1, Vector3 v2) => v1.x < v2.x && v1.y < v2.y && v1.z < v2.z;
+        public static bool operator >(Vector3 v1, Vector3 v2) => v1.x > v2.x && v1.y > v2.y && v1.z > v2.z;
+
+        public static bool operator <=(Vector3 v1, Vector3 v2) => v1.x <= v2.x && v1.y <= v2.y && v1.z <= v2.z;
+        public static bool operator >=(Vector3 v1, Vector3 v2) => v1.x >= v2.x && v1.y >= v2.y && v1.z >= v2.z;
 
         public static Vector3 operator +(Vector3 v1, Vector3 v2) => Add(v1, v2);
 

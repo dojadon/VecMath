@@ -52,13 +52,11 @@ namespace VecMath
             }
             else
             {
-                // Normalize coefficients.
                 double denom = a3;
                 a3 = a2 / denom;
                 a2 = a1 / denom;
                 a1 = a0 / denom;
 
-                // Commence solution.
                 double a_over_3 = a3 / 3.0;
 
                 double Q = (3 * a2 - a3 * a3) / 9.0;
@@ -69,7 +67,6 @@ namespace VecMath
 
                 if (D < 0.0)
                 {
-                    // Three unequal real roots.
                     solution = new double[3];
                     double theta = Math.Acos(R / Math.Sqrt(-Q_CUBE));
                     double SQRT_Q = Math.Sqrt(-Q);
@@ -79,7 +76,6 @@ namespace VecMath
                 }
                 else if (D > 0.0)
                 {
-                    // One real root.
                     solution = new double[1];
                     double SQRT_D = Math.Sqrt(D);
                     double S = Cqrt(R + SQRT_D);
@@ -88,14 +84,12 @@ namespace VecMath
                 }
                 else
                 {
-                    // Three real roots, at least two equal.
                     solution = new double[2];
                     double CBRT_R = Cqrt(R);
                     solution[0] = 2 * CBRT_R - a_over_3;
                     solution[1] = CBRT_R - a_over_3;
                 }
             }
-
             return solution;
         }
 
