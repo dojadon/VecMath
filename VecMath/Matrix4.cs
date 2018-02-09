@@ -278,6 +278,54 @@ namespace VecMath
             return true;
         }
 
+        public override bool Equals(object obj) => obj is Matrix4 m ? Equals(m) : false;
+
+        public bool Equals(Matrix4 m)
+        {
+            return
+            m00 == m.m00 && m10 == m.m10 && m20 == m.m20 && m30 == m.m30 &&
+            m01 == m.m01 && m11 == m.m11 && m21 == m.m21 && m31 == m.m31 &&
+            m02 == m.m02 && m12 == m.m12 && m22 == m.m22 && m32 == m.m32 &&
+            m03 == m.m03 && m13 == m.m13 && m23 == m.m23 && m33 == m.m33;
+        }
+
+        public override int GetHashCode()
+        {
+            long hashCode = 0;
+            hashCode = (hashCode * 31) + m00.GetHashCode();
+            hashCode = (hashCode * 31) + m01.GetHashCode();
+            hashCode = (hashCode * 31) + m02.GetHashCode();
+            hashCode = (hashCode * 31) + m03.GetHashCode();
+
+            hashCode = (hashCode * 31) + m10.GetHashCode();
+            hashCode = (hashCode * 31) + m11.GetHashCode();
+            hashCode = (hashCode * 31) + m12.GetHashCode();
+            hashCode = (hashCode * 31) + m13.GetHashCode();
+
+            hashCode = (hashCode * 31) + m20.GetHashCode();
+            hashCode = (hashCode * 31) + m21.GetHashCode();
+            hashCode = (hashCode * 31) + m22.GetHashCode();
+            hashCode = (hashCode * 31) + m23.GetHashCode();
+
+            hashCode = (hashCode * 31) + m30.GetHashCode();
+            hashCode = (hashCode * 31) + m31.GetHashCode();
+            hashCode = (hashCode * 31) + m32.GetHashCode();
+            hashCode = (hashCode * 31) + m33.GetHashCode();
+            return hashCode.GetHashCode();
+        }
+
+        public static bool operator ==(Matrix4 m1, Matrix4 m2)=>
+            m1.m00 == m2.m00 && m1.m10 == m2.m10 && m1.m20 == m2.m20 && m1.m30 == m2.m30 &&
+            m1.m01 == m2.m01 && m1.m11 == m2.m11 && m1.m21 == m2.m21 && m1.m31 == m2.m31 &&
+            m1.m02 == m2.m02 && m1.m12 == m2.m12 && m1.m22 == m2.m22 && m1.m32 == m2.m32 &&
+            m1.m03 == m2.m03 && m1.m13 == m2.m13 && m1.m23 == m2.m23 && m1.m33 == m2.m33;
+
+        public static bool operator !=(Matrix4 m1, Matrix4 m2) => !(
+            m1.m00 == m2.m00 && m1.m10 == m2.m10 && m1.m20 == m2.m20 && m1.m30 == m2.m30 &&
+            m1.m01 == m2.m01 && m1.m11 == m2.m11 && m1.m21 == m2.m21 && m1.m31 == m2.m31 &&
+            m1.m02 == m2.m02 && m1.m12 == m2.m12 && m1.m22 == m2.m22 && m1.m32 == m2.m32 &&
+            m1.m03 == m2.m03 && m1.m13 == m2.m13 && m1.m23 == m2.m23 && m1.m33 == m2.m33);
+
         public static Matrix4 operator ~(Matrix4 m1) => Inverse(m1);
 
         public static Matrix4 operator *(Matrix4 m1, Matrix4 m2) => Mul(m1, m2);
