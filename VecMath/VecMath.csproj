@@ -53,7 +53,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy VecMath.* C:\tool\model\MikuMikuMoving64_v1275\System\x64
-copy VecMath.dll C:\tool\model\MikuMikuMoving64_v1275\CurtainFireMaker\System\x64</PostBuildEvent>
+    <PostBuildEvent>copy $(TargetFileName) C:\tool\CG_Animation\MikuMikuMoving64_v1275\System\x64
+copy $(TargetFileName) C:\tool\CG_Animation\MikuMikuMoving64_v1275\CurtainFireMaker\System\x64</PostBuildEvent>
   </PropertyGroup>
 </Project>
