@@ -13,6 +13,8 @@ namespace VecMath
         public static readonly Vector3 UnitY = new Vector3(0, 1, 0);
         public static readonly Vector3 UnitZ = new Vector3(0, 0, 1);
 
+        public static readonly Vector3[] Units = { UnitX, UnitY, UnitZ };
+
         private const float EPS = 1.0e-7F;
 
         public float x;
@@ -148,6 +150,8 @@ namespace VecMath
         public bool IsNaN() => float.IsNaN(x) || float.IsNaN(y) || float.IsNaN(z);
 
         public float Length() => (float)Math.Sqrt(x * x + y * y + z * z);
+
+        public float LengthSquare() => x * x + y * y + z * z;
 
         public override string ToString() => $"[{x}, {y}, {z}]";
 

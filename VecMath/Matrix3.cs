@@ -110,6 +110,8 @@ namespace VecMath
 
         public static Matrix3 LookAt(Vector3 forward, Vector3 upward)
         {
+            if (forward == upward) return Identity;
+
             var z = -+forward;
             var x = +(upward ^ z);
             var y = +(z ^ x);

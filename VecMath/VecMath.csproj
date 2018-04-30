@@ -43,6 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EquationUtil.cs" />
+    <Compile Include="Geometry\IGeometry.cs" />
+    <Compile Include="MathUtil.cs" />
     <Compile Include="Matrix3.cs" />
     <Compile Include="Matrix4.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -53,7 +55,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy $(TargetFileName) C:\Tool\CG\MikuMikuMoving64_v1275\System\x64
-copy $(TargetFileName) C:\Tool\CG\MikuMikuMoving64_v1275\CurtainFireMaker\System\x64</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
