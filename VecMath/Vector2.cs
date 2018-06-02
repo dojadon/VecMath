@@ -15,6 +15,34 @@ namespace VecMath
         public float x;
         public float y;
 
+        public float this[int idx]
+        {
+            get
+            {
+                switch (idx)
+                {
+                    case 0: return x;
+                    case 1: return y;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+            set
+            {
+                switch (idx)
+                {
+                    case 0:
+                        x = value;
+                        break;
+                    case 1:
+                        y = value;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
         public Vector2(float x, float y)
         {
             this.x = x;
@@ -23,13 +51,46 @@ namespace VecMath
 
         public Vector2(Vector2 v1) : this(v1.x, v1.y) { }
 
+        public Vector2(Vector3 v1) : this(v1.x, v1.y) { }
+
+        public Vector2(Vector4 v1) : this(v1.x, v1.y) { }
+
         public static Vector2 Add(Vector2 v1, Vector2 v2) => new Vector2(v1.x + v2.x, v1.y + v2.y);
 
         public static Vector2 Sub(Vector2 v1, Vector2 v2) => new Vector2(v1.x - v2.x, v1.y - v2.y);
 
         public static Vector2 Scale(Vector2 v1, float d1) => new Vector2(v1.x * d1, v1.y * d1);
 
+        public static Vector2 Pow(Vector2 v1, float f1) => new Vector2((float)Math.Pow(v1.x, f1), (float)Math.Pow(v1.y, f1));
+
         public static float Dot(Vector2 v1, Vector2 v2) => v2.x * v1.x + v2.y * v1.y;
+
+        public static Vector2 Clamp(Vector2 v, Vector2 min, Vector2 max) => new Vector2()
+        {
+            x = v.x < min.x ? min.x : (max.x < v.x ? max.x : v.x),
+            y = v.y < min.y ? min.y : (max.y < v.y ? max.y : v.y),
+        };
+
+        public static Vector2 Interpolate(Vector2 v1, Vector2 v2, float t)
+        {
+            float dot = v1 * v2;
+            float t1, t2;
+
+            if (1.0F - dot > MathUtil.EPS)
+            {
+                float angle = (float)Math.Acos(v1 * v2);
+                float sin = (float)Math.Sin(angle);
+                t1 = (float)Math.Sin(angle * (1 - t)) / sin;
+                t2 = (float)Math.Sin(angle * t) / sin;
+            }
+            else
+            {
+                t1 = t;
+                t2 = 1 - t;
+            }
+
+            return t1 * v1 + t2 * v2;
+        }
 
         public static Vector2 Normalize(Vector2 v1)
         {

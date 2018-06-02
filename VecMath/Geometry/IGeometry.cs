@@ -7,9 +7,16 @@ namespace VecMath.Geometry
 {
     public interface IGeometry
     {
-        bool IsIntersect(Vector3 pos, Vector3 vec);
-        bool IsIntersect(Vector3 pos);
-        float CalculateTimeToIntersect(Vector3 pos, Vector3 vec);
+        bool IsIntersectWithRay(Vector3 pos, Vector3 vec);
+        bool IsIntersectWithPoint(Vector3 pos);
+        float CalculateTimeToIntersectWithRay(Vector3 pos, Vector3 vec);
+    }
+
+    public class NoneGeometry : IGeometry
+    {
+        public float CalculateTimeToIntersectWithRay(Vector3 pos, Vector3 vec) => float.MaxValue;
+        public bool IsIntersectWithPoint(Vector3 pos) => false;
+        public bool IsIntersectWithRay(Vector3 pos, Vector3 vec) => false;
     }
 
     public struct AABoundingBox : IGeometry
@@ -25,17 +32,17 @@ namespace VecMath.Geometry
             PosMax = MathUtil.Max(pos1, pos2);
         }
 
-        public bool IsIntersect(Vector3 pos)
+        public bool IsIntersectWithPoint(Vector3 pos)
         {
             return MathUtil.WithIn(pos, PosMin, PosMax);
         }
 
-        public bool IsIntersect(Vector3 pos, Vector3 vec)
+        public bool IsIntersectWithRay(Vector3 pos, Vector3 vec)
         {
-            return CalculateTimeToIntersect(pos, vec, out float min, out float max);
+            return IsIntersectWithPoint(pos) || CalculateTimeToIntersect(pos, vec, out float min, out float max);
         }
 
-        public float CalculateTimeToIntersect(Vector3 pos, Vector3 vec)
+        public float CalculateTimeToIntersectWithRay(Vector3 pos, Vector3 vec)
         {
             CalculateTimeToIntersect(pos, vec, out float min, out float max);
             return min;
@@ -46,7 +53,7 @@ namespace VecMath.Geometry
             max = float.MaxValue;
             min = float.MinValue;
 
-            if (IsIntersect(pos))
+            if (IsIntersectWithPoint(pos))
             {
                 min = 0;
 
@@ -73,7 +80,7 @@ namespace VecMath.Geometry
                 min = Math.Max(min, near);
                 max = Math.Min(max, far);
 
-                if (min > max) return false;
+                if (min > max + 1E+4F) return false;
             }
             return true;
         }
@@ -94,12 +101,12 @@ namespace VecMath.Geometry
             Normal = (Pos3 - Pos1) ^ (Pos2 - Pos1);
         }
 
-        public bool IsIntersect(Vector3 pos)
+        public bool IsIntersectWithPoint(Vector3 pos)
         {
             return Math.Abs((Pos1 - pos) * Normal) <= 1E-10;
         }
 
-        public bool IsIntersect(Vector3 pos, Vector3 vec)
+        public bool IsIntersectWithRay(Vector3 pos, Vector3 vec)
         {
             var cross1 = (Pos2 - Pos1) ^ (pos - Pos1);
             var dot1 = cross1 * vec;
@@ -118,7 +125,7 @@ namespace VecMath.Geometry
             return !(dot2 > 0 ^ dot3 > 0);
         }
 
-        public float CalculateTimeToIntersect(Vector3 pos, Vector3 vec)
+        public float CalculateTimeToIntersectWithRay(Vector3 pos, Vector3 vec)
         {
             float dot = Normal * vec;
 
@@ -139,23 +146,64 @@ namespace VecMath.Geometry
             Normal = normal;
         }
 
-        public bool IsIntersect(Vector3 pos)
+        public bool IsIntersectWithPoint(Vector3 pos)
         {
             return Math.Abs((Pos - pos) * Normal) <= 1E-10;
         }
 
-        public bool IsIntersect(Vector3 pos, Vector3 vec)
+        public bool IsIntersectWithRay(Vector3 pos, Vector3 vec)
         {
             return Math.Abs(Normal * vec) > 1E-6;
         }
 
-        public float CalculateTimeToIntersect(Vector3 pos, Vector3 vec)
+        public float CalculateTimeToIntersectWithRay(Vector3 pos, Vector3 vec)
         {
             float dot = Normal * vec;
 
             if (Math.Abs(dot) <= 1E-6) return 1E+6F;
 
             return Normal * (Pos - pos) / dot;
+        }
+    }
+
+    public struct Sphere : IGeometry
+    {
+        public Vector3 Pos { get; }
+        public float Range { get; }
+
+        public Sphere(Vector3 pos,  float range)
+        {
+            Pos = pos;
+            Range = range;
+        }
+
+        public float CalculateTimeToIntersectWithRay(Vector3 pos, Vector3 vec)
+        {
+            var target = Pos - pos;
+            float time = +vec * target;
+
+            if (time <= 0) return 1E+6F;
+
+            float distance = target.LengthSquare() - time * time;
+
+            return distance <= Range * Range ? time / vec.Length() : 1E+6F;
+        }
+
+        public bool IsIntersectWithPoint(Vector3 pos)
+        {
+            return (Pos - pos).LengthSquare() < Range * Range;
+        }
+
+        public bool IsIntersectWithRay(Vector3 pos, Vector3 vec)
+        {
+            var target = Pos - pos;
+            float time = +vec * target;
+
+            if (time <= 0) return false;
+
+            float distance = target.LengthSquare() - time * time;
+
+            return distance <= Range * Range;
         }
     }
 }

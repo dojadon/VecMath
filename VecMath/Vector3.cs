@@ -15,8 +15,6 @@ namespace VecMath
 
         public static readonly Vector3[] Units = { UnitX, UnitY, UnitZ };
 
-        private const float EPS = 1.0e-7F;
-
         public float x;
         public float y;
         public float z;
@@ -60,10 +58,11 @@ namespace VecMath
             this.z = z;
         }
 
-        public Vector3(Vector3 v1) : this(v1.x, v1.y, v1.z)
-        {
+        public Vector3(Vector2 v1) : this(v1.x, v1.y, 0) { }
 
-        }
+        public Vector3(Vector3 v1) : this(v1.x, v1.y, v1.z) { }
+
+        public Vector3(Vector4 v1) : this(v1.x, v1.y, v1.z) { }
 
         public static Vector3 Add(Vector3 v1, Vector3 v2) => new Vector3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
 
@@ -96,7 +95,7 @@ namespace VecMath
             float dot = v1 * v2;
             float t1, t2;
 
-            if (1.0F - dot > EPS)
+            if (1.0F - dot > MathUtil.EPS)
             {
                 float angle = (float)Math.Acos(v1 * v2);
                 float sin = (float)Math.Sin(angle);
@@ -108,7 +107,6 @@ namespace VecMath
                 t1 = t;
                 t2 = 1 - t;
             }
-
             return t1 * v1 + t2 * v2;
         }
 
@@ -119,9 +117,7 @@ namespace VecMath
             if (len == 1) { return v1; }
             if (len == 0) { return Zero; }
 
-            float mult = 1 / len;
-
-            return v1 * mult;
+            return v1 * (1 / len);
         }
 
         public override bool Equals(object obj)
@@ -149,7 +145,7 @@ namespace VecMath
 
         public bool IsNaN() => float.IsNaN(x) || float.IsNaN(y) || float.IsNaN(z);
 
-        public float Length() => (float)Math.Sqrt(x * x + y * y + z * z);
+        public float Length() => (float)Math.Sqrt(LengthSquare());
 
         public float LengthSquare() => x * x + y * y + z * z;
 
