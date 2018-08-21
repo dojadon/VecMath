@@ -66,6 +66,8 @@ namespace VecMath
 
         public static Matrix3 RotationAxis(Vector3 axis, float angle)
         {
+            axis = +axis;
+
             float cos = (float)Math.Cos(angle);
             float sin = (float)Math.Sin(angle);
 
@@ -203,7 +205,7 @@ namespace VecMath
             float[] f1 = (float[])m1;
             float[] f2 = (float[])m2;
 
-            for (int i = 0; i < 16; i++)
+            for (int i = 0; i < 9; i++)
             {
                 diff = f1[i] - f2[i];
                 if ((diff < 0 ? -diff : diff) > epsilon) return false;

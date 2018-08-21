@@ -166,6 +166,28 @@ namespace VecMath.Geometry
         }
     }
 
+    public struct Disk : IGeometry
+    {
+        public Vector3 Pos { get; set; }
+        public Vector3 Normal { get; set; }
+        public float Range { get; set; }
+
+        public float CalculateTimeToIntersectWithRay(Vector3 pos, Vector3 vec)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsIntersectWithPoint(Vector3 pos)
+        {
+            return Math.Abs((Pos - pos) * Normal) <= 1E-10 && (pos - Pos).LengthSquare() <= Range * Range;
+        }
+
+        public bool IsIntersectWithRay(Vector3 pos, Vector3 vec)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public struct Sphere : IGeometry
     {
         public Vector3 Pos { get; }
@@ -179,14 +201,24 @@ namespace VecMath.Geometry
 
         public float CalculateTimeToIntersectWithRay(Vector3 pos, Vector3 vec)
         {
-            var target = Pos - pos;
-            float time = +vec * target;
+            float a0 = vec.LengthSquare();
+            float a1 = vec * (Pos - pos);
+            float a2 = (Pos - pos).LengthSquare() - Range * Range;
 
-            if (time <= 0) return 1E+6F;
+            float d = a1 * a1 -  a0 * a2;
 
-            float distance = target.LengthSquare() - time * time;
+            if (d < 0) return 1E+6F;
 
-            return distance <= Range * Range ? time / vec.Length() : 1E+6F;
+            float d2 = (float)Math.Sqrt(d);
+
+            if (-a1 - d2 >= 0) 
+            {
+                return -(a1 + d2) / (2 * a0);
+            }
+            else
+            {
+                return -(a1 - d2) / (2 * a0);
+            }
         }
 
         public bool IsIntersectWithPoint(Vector3 pos)

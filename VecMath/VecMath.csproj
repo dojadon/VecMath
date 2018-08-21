@@ -45,6 +45,7 @@
     <Compile Include="EquationUtil.cs" />
     <Compile Include="Geometry\IGeometry.cs" />
     <Compile Include="MathUtil.cs" />
+    <Compile Include="Matrix2.cs" />
     <Compile Include="Matrix3.cs" />
     <Compile Include="Matrix4.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
