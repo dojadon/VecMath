@@ -123,10 +123,6 @@ namespace VecMath
 
         public static Matrix2 operator ~(Matrix2 m1) => Inverse(m1);
 
-        public static Matrix2 operator *(Matrix2 m1, Matrix2 m2) => Mul(m1, m2);
-
-        public static Vector2 operator *(Vector2 v1, Matrix2 m1) => Transform(v1, m1);
-
         public static Matrix2 operator *(Matrix2 m1, double d1) => Mul(m1, (float)d1);
     }
 }

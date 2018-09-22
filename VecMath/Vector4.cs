@@ -91,14 +91,14 @@ namespace VecMath
             w = v.w < min.w ? min.w : (max.w < v.w ? max.w : v.w),
         };
 
-        public static Vector3 Interpolate(Vector3 v1, Vector3 v2, float t)
+        public static Vector4 Interpolate(Vector4 v1, Vector4 v2, float t)
         {
-            float dot = v1 * v2;
+            float dot = Dot(v1, v2);
             float t1, t2;
 
             if (1.0F - dot > MathUtil.EPS)
             {
-                float angle = (float)Math.Acos(v1 * v2);
+                float angle = (float)Math.Acos(dot);
                 float sin = (float)Math.Sin(angle);
                 t1 = (float)Math.Sin(angle * (1 - t)) / sin;
                 t2 = (float)Math.Sin(angle * t) / sin;
@@ -166,8 +166,6 @@ namespace VecMath
 
         public static Vector4 operator -(Vector4 v1) => v1 * -1;
 
-        public static Vector4 operator +(Vector4 v1) => Normalize(v1);
-
         public static bool operator ==(Vector4 v1, Vector4 v2) => v1.x == v2.x && v1.y == v2.y && v1.z == v2.z && v1.w == v2.w;
 
         public static bool operator !=(Vector4 v1, Vector4 v2) => !(v1.x == v2.x && v1.y == v2.y && v1.z == v2.z && v1.w == v2.w);
@@ -179,11 +177,5 @@ namespace VecMath
         public static Vector4 operator *(Vector4 v1, double d1) => Scale(v1, (float)d1);
 
         public static Vector4 operator *(double d1, Vector4 v1) => Scale(v1, (float)d1);
-
-        public static float operator *(Vector4 v1, Vector4 v2) => Dot(v1, v2);
-
-        public static explicit operator DxMath.Vector4(Vector4 v1) => new DxMath.Vector4(v1.x, v1.y, v1.z, v1.w);
-
-        public static implicit operator Vector4(DxMath.Vector4 v1) => new Vector4(v1.X, v1.Y, v1.Z, v1.W);
     }
 }

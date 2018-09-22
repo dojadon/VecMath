@@ -20,6 +20,73 @@ namespace VecMath
         public float m21;
         public float m22;
 
+        public float this[int idx1, int idx2]
+        {
+            get
+            {
+                switch (idx1)
+                {
+                    case 0:
+                        switch (idx2)
+                        {
+                            case 0: return m00;
+                            case 1: return m01;
+                            case 2: return m02;
+                        }
+                        break;
+                    case 1:
+                        switch (idx2)
+                        {
+                            case 0: return m10;
+                            case 1: return m11;
+                            case 2: return m12;
+                        }
+                        break;
+                    case 2:
+                        switch (idx2)
+                        {
+                            case 0: return m20;
+                            case 1: return m21;
+                            case 2: return m22;
+                        }
+                        break;
+                }
+                throw new ArgumentOutOfRangeException(idx1 + ", " + idx2);
+            }
+
+            set
+            {
+                switch (idx1)
+                {
+                    case 0:
+                        switch (idx2)
+                        {
+                            case 0: m00 = value; return;
+                            case 1: m01 = value; return;
+                            case 2: m02 = value; return;
+                        }
+                        break;
+                    case 1:
+                        switch (idx2)
+                        {
+                            case 0: m10 = value; return;
+                            case 1: m11 = value; return;
+                            case 2: m12 = value; return;
+                        }
+                        break;
+                    case 2:
+                        switch (idx2)
+                        {
+                            case 0: m20 = value; return;
+                            case 1: m21 = value; return;
+                            case 2: m22 = value; return;
+                        }
+                        break;
+                }
+                throw new ArgumentOutOfRangeException(idx1 + ", " + idx2);
+            }
+        }
+
         public Matrix3(float m00, float m01, float m02, float m10, float m11, float m12, float m20, float m21, float m22)
         {
             this.m00 = m00;
@@ -64,24 +131,27 @@ namespace VecMath
 
         public Matrix3(Matrix4 m) : this(m.m00, m.m01, m.m02, m.m10, m.m11, m.m12, m.m20, m.m21, m.m22) { }
 
-        public static Matrix3 RotationAxis(Vector3 axis, float angle)
+        public static Matrix3 RotationAxis(Vector3 axis, float angle, bool normalize = true)
         {
-            axis = +axis;
+            if (normalize)
+            {
+                axis = MathUtil.Normalize(axis);
+            }
 
             float cos = (float)Math.Cos(angle);
             float sin = (float)Math.Sin(angle);
 
             var x = Vector3.UnitX;
             var n = axis.x * axis;
-            x = cos * (x - n) + sin * (axis ^ x) + n;
+            x = cos * (x - n) + sin * MathUtil.Cross(axis, x) + n;
 
             var y = Vector3.UnitY;
             n = axis.y * axis;
-            y = cos * (y - n) + sin * (axis ^ y) + n;
+            y = cos * (y - n) + sin * MathUtil.Cross(axis, y) + n;
 
             var z = Vector3.UnitZ;
             n = axis.z * axis;
-            z = cos * (z - n) + sin * (axis ^ z) + n;
+            z = cos * (z - n) + sin * MathUtil.Cross(axis, z) + n;
 
             return new Matrix3(x, y, z);
         }
@@ -114,9 +184,9 @@ namespace VecMath
         {
             if (forward == upward) return Identity;
 
-            var z = -+forward;
-            var x = +(upward ^ z);
-            var y = +(z ^ x);
+            var z = -MathUtil.Normalize(forward);
+            var x = MathUtil.Normalize(MathUtil.Cross(upward, z));
+            var y = MathUtil.Normalize(MathUtil.Cross(z, x));
 
             return new Matrix3(x, y, z);
         }
@@ -150,11 +220,6 @@ namespace VecMath
             m21 = m.m21 * f,
             m22 = m.m22 * f,
         };
-
-        public static Matrix3 Pow(Matrix3 m, float exponent)
-        {
-            return ((Quaternion)m) ^ exponent;
-        }
 
         public static Matrix3 Inverse(Matrix3 m)
         {
@@ -201,13 +266,9 @@ namespace VecMath
 
         public static bool EpsilonEquals(Matrix3 m1, Matrix3 m2, float epsilon)
         {
-            float diff;
-            float[] f1 = (float[])m1;
-            float[] f2 = (float[])m2;
-
             for (int i = 0; i < 9; i++)
             {
-                diff = f1[i] - f2[i];
+                float diff = m1[i / 3, i % 3] - m2[i / 3, i % 3];
                 if ((diff < 0 ? -diff : diff) > epsilon) return false;
             }
             return true;
@@ -219,55 +280,14 @@ namespace VecMath
 
         public static Matrix3 operator ~(Matrix3 m1) => Inverse(m1);
 
-        public static Matrix3 operator *(Matrix3 m1, Matrix3 m2) => Mul(m1, m2);
+        public static Matrix3 operator *(Matrix3 m1, double d1) => Mul(m1, (float)d1);
 
         public static Vector3 operator *(Vector3 v1, Matrix3 m1) => Transform(v1, m1);
 
-        public static Matrix3 operator *(Matrix3 m1, double d1) => Mul(m1, (float)d1);
-
-        public static Matrix3 operator ^(Matrix3 m1, double d1) => Pow(m1, (float)d1);
+        public static Matrix3 operator *(Matrix3 m1, Matrix3 m2) => Mul(m1, m2);
 
         public static implicit operator Matrix3(Quaternion q1) => new Matrix3(q1);
 
         public static implicit operator Matrix3(Matrix4 m) => new Matrix3(m);
-
-        public static explicit operator float[] (Matrix3 m)
-        {
-            var result = new float[16];
-
-            int index = 0;
-            result[index++] = m.m00;
-            result[index++] = m.m01;
-            result[index++] = m.m02;
-
-            result[index++] = m.m10;
-            result[index++] = m.m11;
-            result[index++] = m.m12;
-
-            result[index++] = m.m20;
-            result[index++] = m.m21;
-            result[index++] = m.m22;
-
-            return result;
-        }
-
-        public static implicit operator Matrix3(float[] src)
-        {
-            int index = 0;
-            return new Matrix3()
-            {
-                m00 = src[index++],
-                m01 = src[index++],
-                m02 = src[index++],
-
-                m10 = src[index++],
-                m11 = src[index++],
-                m12 = src[index++],
-
-                m20 = src[index++],
-                m21 = src[index++],
-                m22 = src[index++],
-            };
-        }
     }
 }

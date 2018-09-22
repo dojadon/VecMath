@@ -98,40 +98,40 @@ namespace VecMath.Geometry
             Pos1 = pos1;
             Pos2 = pos2;
             Pos3 = pos3;
-            Normal = (Pos3 - Pos1) ^ (Pos2 - Pos1);
+            Normal = MathUtil.Cross(Pos3 - Pos1, Pos2 - Pos1);
         }
 
         public bool IsIntersectWithPoint(Vector3 pos)
         {
-            return Math.Abs((Pos1 - pos) * Normal) <= 1E-10;
+            return Math.Abs(MathUtil.Dot((Pos1 - pos), Normal)) <= 1E-10;
         }
 
         public bool IsIntersectWithRay(Vector3 pos, Vector3 vec)
         {
-            var cross1 = (Pos2 - Pos1) ^ (pos - Pos1);
-            var dot1 = cross1 * vec;
+            var cross1 = MathUtil.Cross(Pos2 - Pos1, pos - Pos1);
+            var dot1 = MathUtil.Dot(cross1, vec);
 
-            var cross2 = (Pos3 - Pos2) ^ (pos - Pos2);
-            var dot2 = cross2 * vec;
+            var cross2 = MathUtil.Cross(Pos3 - Pos2, pos - Pos2);
+            var dot2 = MathUtil.Dot(cross2, vec);
 
             if (dot1 > 0 ^ dot2 > 0)
             {
                 return false;
             }
 
-            var cross3 = (Pos1 - Pos3) ^ (pos - Pos3);
-            var dot3 = cross3 * vec;
+            var cross3 = MathUtil.Cross(Pos1 - Pos3, pos - Pos3);
+            var dot3 = MathUtil.Dot(cross3, vec);
 
             return !(dot2 > 0 ^ dot3 > 0);
         }
 
         public float CalculateTimeToIntersectWithRay(Vector3 pos, Vector3 vec)
         {
-            float dot = Normal * vec;
+            float dot = MathUtil.Dot(Normal, vec);
 
             if (Math.Abs(dot) <= 1E-6) return 1E+6F;
 
-            return Normal * (Pos1 - pos) / dot;
+            return MathUtil.Dot(Normal, Pos1 - pos) / dot;
         }
     }
 
@@ -148,21 +148,21 @@ namespace VecMath.Geometry
 
         public bool IsIntersectWithPoint(Vector3 pos)
         {
-            return Math.Abs((Pos - pos) * Normal) <= 1E-10;
+            return Math.Abs(MathUtil.Dot(Pos - pos, Normal)) <= 1E-10;
         }
 
         public bool IsIntersectWithRay(Vector3 pos, Vector3 vec)
         {
-            return Math.Abs(Normal * vec) > 1E-6;
+            return Math.Abs(MathUtil.Dot(Normal, vec)) > 1E-6;
         }
 
         public float CalculateTimeToIntersectWithRay(Vector3 pos, Vector3 vec)
         {
-            float dot = Normal * vec;
+            float dot = MathUtil.Dot(Normal, vec);
 
             if (Math.Abs(dot) <= 1E-6) return 1E+6F;
 
-            return Normal * (Pos - pos) / dot;
+            return MathUtil.Dot(Normal, Pos - pos) / dot;
         }
     }
 
@@ -179,7 +179,7 @@ namespace VecMath.Geometry
 
         public bool IsIntersectWithPoint(Vector3 pos)
         {
-            return Math.Abs((Pos - pos) * Normal) <= 1E-10 && (pos - Pos).LengthSquare() <= Range * Range;
+            return Math.Abs(MathUtil.Dot(Pos - pos, Normal)) <= 1E-10 && (pos - Pos).LengthSquare() <= Range * Range;
         }
 
         public bool IsIntersectWithRay(Vector3 pos, Vector3 vec)
@@ -193,7 +193,7 @@ namespace VecMath.Geometry
         public Vector3 Pos { get; }
         public float Range { get; }
 
-        public Sphere(Vector3 pos,  float range)
+        public Sphere(Vector3 pos, float range)
         {
             Pos = pos;
             Range = range;
@@ -202,16 +202,16 @@ namespace VecMath.Geometry
         public float CalculateTimeToIntersectWithRay(Vector3 pos, Vector3 vec)
         {
             float a0 = vec.LengthSquare();
-            float a1 = vec * (Pos - pos);
+            float a1 = MathUtil.Dot(vec, Pos - pos);
             float a2 = (Pos - pos).LengthSquare() - Range * Range;
 
-            float d = a1 * a1 -  a0 * a2;
+            float d = a1 * a1 - a0 * a2;
 
             if (d < 0) return 1E+6F;
 
             float d2 = (float)Math.Sqrt(d);
 
-            if (-a1 - d2 >= 0) 
+            if (-a1 - d2 >= 0)
             {
                 return -(a1 + d2) / (2 * a0);
             }
@@ -229,7 +229,7 @@ namespace VecMath.Geometry
         public bool IsIntersectWithRay(Vector3 pos, Vector3 vec)
         {
             var target = Pos - pos;
-            float time = +vec * target;
+            float time = MathUtil.Dot(MathUtil.Normalize(vec), target);
 
             if (time <= 0) return false;
 

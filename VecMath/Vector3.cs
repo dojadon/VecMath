@@ -19,6 +19,36 @@ namespace VecMath
         public float y;
         public float z;
 
+        public Vector2 xy
+        {
+            get => new Vector2(x, y);
+            set
+            {
+                x = value.x;
+                y = value.y;
+            }
+        }
+
+        public Vector2 xz
+        {
+            get => new Vector2(x, z);
+            set
+            {
+                x = value.x;
+                z = value.y;
+            }
+        }
+
+        public Vector2 yz
+        {
+            get => new Vector2(y, z);
+            set
+            {
+                y = value.x;
+                z = value.y;
+            }
+        }
+
         public float this[int idx]
         {
             get
@@ -92,12 +122,12 @@ namespace VecMath
 
         public static Vector3 Interpolate(Vector3 v1, Vector3 v2, float t)
         {
-            float dot = v1 * v2;
+            float dot = Dot(v1, v2);
             float t1, t2;
 
             if (1.0F - dot > MathUtil.EPS)
             {
-                float angle = (float)Math.Acos(v1 * v2);
+                float angle = (float)Math.Acos(dot);
                 float sin = (float)Math.Sin(angle);
                 t1 = (float)Math.Sin(angle * (1 - t)) / sin;
                 t2 = (float)Math.Sin(angle * t) / sin;
@@ -155,8 +185,6 @@ namespace VecMath
 
         public static Vector3 operator -(Vector3 v1) => v1 * -1;
 
-        public static Vector3 operator +(Vector3 v1) => Normalize(v1);
-
         public static bool operator ==(Vector3 v1, Vector3 v2) => v1.x == v2.x && v1.y == v2.y && v1.z == v2.z;
         public static bool operator !=(Vector3 v1, Vector3 v2) => !(v1.x == v2.x && v1.y == v2.y && v1.z == v2.z);
 
@@ -174,22 +202,8 @@ namespace VecMath
 
         public static Vector3 operator *(double d1, Vector3 v1) => Scale(v1, (float)d1);
 
-        public static Vector3 operator ^(Vector3 v1, double d1) => Pow(v1, (float)d1);
-
-        public static float operator *(Vector3 v1, Vector3 v2) => Dot(v1, v2);
-
-        public static Vector3 operator ^(Vector3 v1, Vector3 v2) => Cross(v1, v2);
-
         public static explicit operator Vector4(Vector3 v1) => new Vector4(v1.x, v1.y, v1.z, 1);
 
         public static implicit operator Vector3(Vector4 v1) => new Vector3(v1.x, v1.y, v1.z);
-
-        public static explicit operator DxMath.Vector3(Vector3 v1) => new DxMath.Vector3(v1.x, v1.y, v1.z);
-
-        public static implicit operator Vector3(DxMath.Vector3 v1) => new Vector3(v1.X, v1.Y, v1.Z);
-
-        public static explicit operator float[] (Vector3 v1) => new float[] { v1.x, v1.y, v1.z };
-
-        public static implicit operator Vector3(float[] f) => new Vector3(f[0], f[1], f[2]);
     }
 }

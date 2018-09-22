@@ -57,6 +57,97 @@ namespace VecMath
             }
         }
 
+        public float this[int idx1, int idx2]
+        {
+            get
+            {
+                switch (idx1)
+                {
+                    case 0:
+                        switch (idx2)
+                        {
+                            case 0: return m00;
+                            case 1: return m01;
+                            case 2: return m02;
+                            case 3: return m03;
+                        }
+                        break;
+                    case 1:
+                        switch (idx2)
+                        {
+                            case 0: return m10;
+                            case 1: return m11;
+                            case 2: return m12;
+                            case 3: return m13;
+                        }
+                        break;
+                    case 2:
+                        switch (idx2)
+                        {
+                            case 0: return m20;
+                            case 1: return m21;
+                            case 2: return m22;
+                            case 3: return m23;
+                        }
+                        break;
+                    case 3:
+                        switch (idx2)
+                        {
+                            case 0: return m30;
+                            case 1: return m31;
+                            case 2: return m32;
+                            case 3: return m33;
+                        }
+                        break;
+                }
+                throw new ArgumentOutOfRangeException(idx1 + ", " + idx2);
+            }
+
+            set
+            {
+                switch (idx1)
+                {
+                    case 0:
+                        switch (idx2)
+                        {
+                            case 0: m00 = value; return;
+                            case 1: m01 = value; return;
+                            case 2: m02 = value; return;
+                            case 3: m03 = value; return;
+                        }
+                        break;
+                    case 1:
+                        switch (idx2)
+                        {
+                            case 0: m10 = value; return;
+                            case 1: m11 = value; return;
+                            case 2: m12 = value; return;
+                            case 3: m13 = value; return;
+                        }
+                        break;
+                    case 2:
+                        switch (idx2)
+                        {
+                            case 0: m20 = value; return;
+                            case 1: m21 = value; return;
+                            case 2: m22 = value; return;
+                            case 3: m23 = value; return;
+                        }
+                        break;
+                    case 3:
+                        switch (idx2)
+                        {
+                            case 0: m30 = value; return;
+                            case 1: m31 = value; return;
+                            case 2: m32 = value; return;
+                            case 3: m33 = value; return;
+                        }
+                        break;
+                }
+                throw new ArgumentOutOfRangeException(idx1 + ", " + idx2);
+            }
+        }
+
         public Matrix4(float m00, float m01, float m02, float m03, float m10, float m11, float m12, float m13, float m20, float m21,
             float m22, float m23, float m30, float m31, float m32, float m33)
         {
@@ -81,6 +172,10 @@ namespace VecMath
             this.m33 = m33;
         }
 
+        public Matrix4(float x, float y, float z, Vector3 trans) : this(x, 0, 0, 0, 0, y, 0, 0, 0, 0, z, 0, trans.x, trans.y, trans.z, 1) { }
+
+        public Matrix4(float x, float y, float z) : this(x, y, z, Vector3.Zero) { }
+
         public Matrix4(Vector3 x, Vector3 y, Vector3 z, Vector3 trans)
         : this(x.x, y.x, z.x, 0, x.y, y.y, z.y, 0, x.z, y.z, z.z, 0, trans.x, trans.y, trans.z, 1) { }
 
@@ -99,31 +194,33 @@ namespace VecMath
 
         public static Matrix4 RotationAxis(Vector3 axis, float angle, Vector3 trans)
         {
+            axis = MathUtil.Normalize(axis);
+
             float cos = (float)Math.Cos(angle);
             float sin = (float)Math.Sin(angle);
 
             var x = Vector3.UnitX;
             var n = axis.x * axis;
-            x = cos * (x - n) + sin * (axis ^ x) + n;
+            x = cos * (x - n) + sin * MathUtil.Cross(axis, x) + n;
 
             var y = Vector3.UnitY;
             n = axis.y * axis;
-            y = cos * (y - n) + sin * (axis ^ y) + n;
+            y = cos * (y - n) + sin * MathUtil.Cross(axis, y) + n;
 
             var z = Vector3.UnitZ;
             n = axis.z * axis;
-            z = cos * (z - n) + sin * (axis ^ z) + n;
+            z = cos * (z - n) + sin * MathUtil.Cross(axis, z) + n;
 
             return new Matrix4(x, y, z, trans);
         }
 
         public static Matrix4 LookAt(Vector3 center, Vector3 eye, Vector3 upward)
         {
-            var z = +(eye - center);
-            var x = +(upward ^ z);
-            var y = +(z ^ x);
+            var z = MathUtil.Normalize(eye - center);
+            var x = MathUtil.Normalize(MathUtil.Cross(upward, z));
+            var y = MathUtil.Normalize(MathUtil.Cross(z, x));
 
-            return new Matrix4(x, y, z, new Vector3(-x * eye, -y * eye, -z * eye));
+            return new Matrix4(x, y, z, new Vector3(-MathUtil.Dot(x, eye), -MathUtil.Dot(y, eye), -MathUtil.Dot(z, eye)));
         }
 
         public static Matrix4 Perspective(float width, float height, float zNear, float zFar, float fovy)
@@ -149,6 +246,29 @@ namespace VecMath
             m32 = -1,
         };
 
+        public static Matrix4 Add(Matrix4 m1, Matrix4 m2) => new Matrix4
+        {
+            m00 = m1.m00 + m2.m00,
+            m01 = m1.m01 + m2.m01,
+            m02 = m1.m02 + m2.m02,
+            m03 = m1.m03 + m2.m03,
+
+            m10 = m1.m10 + m2.m10,
+            m11 = m1.m11 + m2.m11,
+            m12 = m1.m12 + m2.m12,
+            m13 = m1.m13 + m2.m13,
+
+            m20 = m1.m20 + m2.m20,
+            m21 = m1.m21 + m2.m21,
+            m22 = m1.m22 + m2.m22,
+            m23 = m1.m23 + m2.m23,
+
+            m30 = m1.m30 + m2.m30,
+            m31 = m1.m31 + m2.m31,
+            m32 = m1.m32 + m2.m32,
+            m33 = m1.m33 + m2.m33,
+        };
+
         public static Matrix4 Mul(Matrix4 m1, Matrix4 m2) => new Matrix4()
         {
             m00 = m1.m00 * m2.m00 + m1.m01 * m2.m10 + m1.m02 * m2.m20 + m1.m03 * m2.m30,
@@ -172,6 +292,29 @@ namespace VecMath
             m33 = m1.m30 * m2.m03 + m1.m31 * m2.m13 + m1.m32 * m2.m23 + m1.m33 * m2.m33
         };
 
+        public static Matrix4 Mul(Matrix4 m, float f) => new Matrix4
+        {
+            m00 = m.m00 * f,
+            m01 = m.m01 * f,
+            m02 = m.m02 * f,
+            m03 = m.m03 * f,
+
+            m10 = m.m10 * f,
+            m11 = m.m11 * f,
+            m12 = m.m12 * f,
+            m13 = m.m13 * f,
+
+            m20 = m.m20 * f,
+            m21 = m.m21 * f,
+            m22 = m.m22 * f,
+            m23 = m.m23 * f,
+
+            m30 = m.m30 * f,
+            m31 = m.m31 * f,
+            m32 = m.m32 * f,
+            m33 = m.m33 * f,
+        };
+
         public static Matrix4 InverseOrthonormal(Matrix4 m1)
         {
             var inv = ~m1.Rotation;
@@ -180,33 +323,31 @@ namespace VecMath
 
         public static Matrix4 Inverse(Matrix4 m1)
         {
-            float[][] array = (float[][])m1;
-            float[][] invArray = (float[][])Identity;
-
+            var inv = Identity;
             float buf;
 
             for (int i = 0; i < 4; i++)
             {
-                buf = 1 / array[i][i];
+                buf = 1 / m1[i, i];
                 for (int j = 0; j < 4; j++)
                 {
-                    array[i][j] *= buf;
-                    invArray[i][j] *= buf;
+                    m1[i, j] *= buf;
+                    inv[i, j] *= buf;
                 }
                 for (int j = 0; j < 4; j++)
                 {
                     if (i != j)
                     {
-                        buf = array[j][i];
+                        buf = m1[j, i];
                         for (int k = 0; k < 4; k++)
                         {
-                            array[j][k] -= array[i][k] * buf;
-                            invArray[j][k] -= invArray[i][k] * buf;
+                            m1[j, k] -= m1[i, k] * buf;
+                            inv[j, k] -= inv[i, k] * buf;
                         }
                     }
                 }
             }
-            return invArray;
+            return inv;
         }
 
         public static Matrix4 Transpose(Matrix4 m1) => new Matrix4()
@@ -266,13 +407,9 @@ namespace VecMath
 
         public static bool EpsilonEquals(Matrix4 m1, Matrix4 m2, float epsilon)
         {
-            float diff;
-            float[] f1 = (float[])m1;
-            float[] f2 = (float[])m2;
-
             for (int i = 0; i < 16; i++)
             {
-                diff = f1[i] - f2[i];
+                float diff = m1[i / 4, i % 4] - m2[i / 4, i % 4];
                 if ((diff < 0 ? -diff : diff) > epsilon) return false;
             }
             return true;
@@ -314,7 +451,7 @@ namespace VecMath
             return hashCode.GetHashCode();
         }
 
-        public static bool operator ==(Matrix4 m1, Matrix4 m2)=>
+        public static bool operator ==(Matrix4 m1, Matrix4 m2) =>
             m1.m00 == m2.m00 && m1.m10 == m2.m10 && m1.m20 == m2.m20 && m1.m30 == m2.m30 &&
             m1.m01 == m2.m01 && m1.m11 == m2.m11 && m1.m21 == m2.m21 && m1.m31 == m2.m31 &&
             m1.m02 == m2.m02 && m1.m12 == m2.m12 && m1.m22 == m2.m22 && m1.m32 == m2.m32 &&
@@ -328,18 +465,30 @@ namespace VecMath
 
         public static Matrix4 operator ~(Matrix4 m1) => Inverse(m1);
 
-        public static Matrix4 operator *(Matrix4 m1, Matrix4 m2) => Mul(m1, m2);
+        public static Matrix4 operator +(Matrix4 m1, Matrix4 m2) => Add(m1, m2);
+
+        public static Vector3 operator *(Vector3 v1, Matrix4 m1) => Transform(v1, m1);
 
         public static Vector4 operator *(Vector4 v1, Matrix4 m1) => Transform(v1, m1);
 
-        public static Vector3 operator *(Vector3 v1, Matrix4 m1) => Transform(v1, m1);
+        public static Matrix4 operator *(Matrix4 m1, Matrix4 m2) => Mul(m1, m2);
+
+        public static Matrix4 operator *(Matrix4 m1, float f) => Mul(m1, f);
 
         public static implicit operator Matrix4(Matrix3 m) => new Matrix4(m);
 
         public static implicit operator Matrix4(Quaternion q1) => new Matrix4(q1);
 
         public static explicit operator float[] (Matrix4 m) => new[]
-        {
+       {
+        m.m00, m.m01, m.m02, m.m03,
+        m.m10, m.m11, m.m12, m.m13,
+        m.m20, m.m21, m.m22, m.m23,
+        m.m30, m.m31, m.m32, m.m33
+        };
+
+        public static explicit operator double[] (Matrix4 m) => new double[]
+      {
         m.m00, m.m01, m.m02, m.m03,
         m.m10, m.m11, m.m12, m.m13,
         m.m20, m.m21, m.m22, m.m23,
@@ -370,41 +519,6 @@ namespace VecMath
                 m31 = src[index++],
                 m32 = src[index++],
                 m33 = src[index++]
-            };
-        }
-
-        public static explicit operator float[][] (Matrix4 m) => new[]
-        {
-        new []{ m.m00, m.m01, m.m02, m.m03 },
-        new []{ m.m10, m.m11, m.m12, m.m13 },
-        new []{ m.m20, m.m21, m.m22, m.m23 },
-        new []{ m.m30, m.m31, m.m32, m.m33 }
-        };
-
-        public static implicit operator Matrix4(float[][] src)
-        {
-            int index1 = 0, index2 = 0;
-            return new Matrix4()
-            {
-                m00 = src[index1][index2++],
-                m01 = src[index1][index2++],
-                m02 = src[index1][index2++],
-                m03 = src[index1++][index2++],
-
-                m10 = src[index1][(index2 = 1) - 1],
-                m11 = src[index1][index2++],
-                m12 = src[index1][index2++],
-                m13 = src[index1++][index2++],
-
-                m20 = src[index1][(index2 = 1) - 1],
-                m21 = src[index1][index2++],
-                m22 = src[index1][index2++],
-                m23 = src[index1++][index2++],
-
-                m30 = src[index1][(index2 = 1) - 1],
-                m31 = src[index1][index2++],
-                m32 = src[index1][index2++],
-                m33 = src[index1++][index2++],
             };
         }
     }

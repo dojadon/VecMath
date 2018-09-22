@@ -20,14 +20,12 @@ namespace VecMath
 
         public Quaternion(float x, float y, float z, float w)
         {
-            float mag;
-            mag = 1.0F / (float)Math.Sqrt(x * x + y * y + z * z + w * w);
-            this.x = x * mag;
-            this.y = y * mag;
-            this.z = z * mag;
-            this.w = w * mag;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.w = w;
         }
-
+        
         public Quaternion(Quaternion q1) : this(q1.x, q1.y, q1.z, q1.w) { }
 
         public Quaternion(Vector3 v1, float w) : this(v1.x, v1.y, v1.z, w) { }
@@ -256,8 +254,6 @@ namespace VecMath
 
         public static bool operator !=(Quaternion q1, Quaternion q2) => !(q1.x == q2.x && q1.y == q2.y && q1.z == q2.z && q1.w == q2.w);
 
-        public static Quaternion operator +(Quaternion q1) => Normalize(q1);
-
         public static Quaternion operator -(Quaternion q1) => Conjugate(q1);
 
         public static Quaternion operator ~(Quaternion q1) => Inverse(q1);
@@ -271,9 +267,5 @@ namespace VecMath
         public static implicit operator Quaternion(Matrix4 m1) => new Quaternion(m1);
 
         public static implicit operator Quaternion(Matrix3 m1) => new Quaternion(m1);
-
-        public static implicit operator Quaternion(DxMath.Quaternion q1) => new Quaternion(q1.X, q1.Y, q1.Z, q1.W);
-
-        public static explicit operator DxMath.Quaternion(Quaternion q1) => new DxMath.Quaternion(q1.x, q1.y, q1.z, q1.w);
     }
 }

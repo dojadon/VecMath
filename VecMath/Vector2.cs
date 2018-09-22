@@ -73,12 +73,12 @@ namespace VecMath
 
         public static Vector2 Interpolate(Vector2 v1, Vector2 v2, float t)
         {
-            float dot = v1 * v2;
+            float dot = Dot(v1, v2);
             float t1, t2;
 
             if (1.0F - dot > MathUtil.EPS)
             {
-                float angle = (float)Math.Acos(v1 * v2);
+                float angle = (float)Math.Acos(dot);
                 float sin = (float)Math.Sin(angle);
                 t1 = (float)Math.Sin(angle * (1 - t)) / sin;
                 t2 = (float)Math.Sin(angle * t) / sin;
@@ -88,7 +88,6 @@ namespace VecMath
                 t1 = t;
                 t2 = 1 - t;
             }
-
             return t1 * v1 + t2 * v2;
         }
 
@@ -131,8 +130,6 @@ namespace VecMath
 
         public static Vector2 operator -(Vector2 v1) => v1 * -1;
 
-        public static Vector2 operator +(Vector2 v1) => Normalize(v1);
-
         public static bool operator ==(Vector2 v1, Vector2 v2) => v1.x == v2.x && v1.y == v2.y;
 
         public static bool operator !=(Vector2 v1, Vector2 v2) => !(v1.x == v2.x && v1.y == v2.y);
@@ -144,11 +141,5 @@ namespace VecMath
         public static Vector2 operator *(Vector2 v1, double d1) => Scale(v1, (float)d1);
 
         public static Vector2 operator *(double d1, Vector2 v1) => Scale(v1, (float)d1);
-
-        public static float operator *(Vector2 v1, Vector2 v2) => Dot(v1, v2);
-
-        public static explicit operator DxMath.Vector2(Vector2 v1) => new DxMath.Vector2((float)v1.x, (float)v1.y);
-
-        public static implicit operator Vector2(DxMath.Vector2 v1) => new Vector2(v1.X, v1.Y);
     }
 }
