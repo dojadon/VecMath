@@ -7,6 +7,8 @@ namespace VecMath
 {
     public struct Matrix2
     {
+        public static Matrix2 Identity { get; } = new Matrix2(1, 0, 0, 1);
+
         public float m00;
         public float m01;
         public float m10;

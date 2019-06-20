@@ -46,7 +46,7 @@ namespace VecMath
         {
             double[] solution;
 
-            if (a0 == 0)
+            if (a3 == 0)
             {
                 solution = SolveQuadratic(a2, a1, a0);
             }

@@ -182,7 +182,7 @@ namespace VecMath
 
         public static Matrix3 LookAt(Vector3 forward, Vector3 upward)
         {
-            if (forward == upward) return Identity;
+            if (forward == upward || forward == -upward) return Identity;
 
             var z = -MathUtil.Normalize(forward);
             var x = MathUtil.Normalize(MathUtil.Cross(upward, z));
@@ -264,6 +264,35 @@ namespace VecMath
             z = v1.x * m1.m02 + v1.y * m1.m12 + v1.z * m1.m22
         };
 
+        public Matrix2 SubMatrix(int row, int coulm)
+        {
+            var result = Matrix2.Identity;
+
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    result[i, j] = this[i < row ? i : i + 1, j < coulm ? j : j + 1];
+                }
+            }
+            return result;
+        }
+
+        public float[] CalcEigenvalues()
+        {
+            float a2 = -(m00 + m11 + m22);
+            float a1 = SubMatrix(0, 0).Det() + SubMatrix(1, 1).Det() + SubMatrix(2, 2).Det();
+            float a0 = -Det();
+
+            double[] solution = EquationUtil.SolveCubic(1, a2, a1, a0);
+            return solution.Select(d=>(float)d).ToArray();
+        }
+
+        public static bool IsNaN(Matrix3 m) =>
+            float.IsNaN(m.m00) || float.IsNaN(m.m01) || float.IsNaN(m.m02) ||
+            float.IsNaN(m.m10) || float.IsNaN(m.m11) || float.IsNaN(m.m12) ||
+            float.IsNaN(m.m20) || float.IsNaN(m.m21) || float.IsNaN(m.m22);
+
         public static bool EpsilonEquals(Matrix3 m1, Matrix3 m2, float epsilon)
         {
             for (int i = 0; i < 9; i++)
@@ -274,7 +303,7 @@ namespace VecMath
             return true;
         }
 
-        public float Det() => m00 * m11 * m22 + m01 * m12 * m21 + m02 * m10 * m21 - m02 * m11 * m21 - m01 * m10 * m22 - m00 * m12 * m21;
+        public float Det() => m00 * m11 * m22 + m01 * m12 * m21 + m02 * m10 * m21 - m02 * m11 * m20 - m01 * m10 * m22 - m00 * m12 * m21;
 
         public override string ToString() => $"[{m00}, {m01}, {m02}]\n[{m10}, {m11}, {m12}]\n[{m20}, {m21}, {m22}]";
 

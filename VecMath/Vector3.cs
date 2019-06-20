@@ -5,6 +5,18 @@ using System.Text;
 
 namespace VecMath
 {
+    public struct Ray
+    {
+        public Vector3 pos;
+        public Vector3 vec;
+
+        public Ray(Vector3 pos, Vector3 vec)
+        {
+            this.pos = pos;
+            this.vec = vec;
+        }
+    }
+
     [Serializable]
     public struct Vector3
     {
@@ -94,11 +106,15 @@ namespace VecMath
 
         public Vector3(Vector4 v1) : this(v1.x, v1.y, v1.z) { }
 
+        public Vector3(IEnumerable<float> e) : this(e.First(), e.First(), e.First()) { }
+
         public static Vector3 Add(Vector3 v1, Vector3 v2) => new Vector3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
 
         public static Vector3 Sub(Vector3 v1, Vector3 v2) => new Vector3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
 
         public static Vector3 Scale(Vector3 v1, float d1) => new Vector3(v1.x * d1, v1.y * d1, v1.z * d1);
+
+        public static Vector3 Scale(Vector3 v1, float x, float y, float z) => new Vector3(v1.x * x, v1.y * y, v1.z * z);
 
         public static Vector3 Scale(Vector3 v1, Vector3 v2) => new Vector3(v1.x * v2.x, v1.y * v2.y, v1.z * v2.z);
 

@@ -405,6 +405,12 @@ namespace VecMath
             return sb.ToString();
         }
 
+        public static bool IsNaN(Matrix4 m) =>
+            float.IsNaN(m.m00) || float.IsNaN(m.m01) || float.IsNaN(m.m02) || float.IsNaN(m.m03) ||
+            float.IsNaN(m.m10) || float.IsNaN(m.m11) || float.IsNaN(m.m12) || float.IsNaN(m.m13) ||
+            float.IsNaN(m.m20) || float.IsNaN(m.m21) || float.IsNaN(m.m22) || float.IsNaN(m.m23) ||
+            float.IsNaN(m.m30) || float.IsNaN(m.m31) || float.IsNaN(m.m32) || float.IsNaN(m.m33);
+
         public static bool EpsilonEquals(Matrix4 m1, Matrix4 m2, float epsilon)
         {
             for (int i = 0; i < 16; i++)

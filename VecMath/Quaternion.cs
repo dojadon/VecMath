@@ -25,7 +25,7 @@ namespace VecMath
             this.z = z;
             this.w = w;
         }
-        
+
         public Quaternion(Quaternion q1) : this(q1.x, q1.y, q1.z, q1.w) { }
 
         public Quaternion(Vector3 v1, float w) : this(v1.x, v1.y, v1.z, w) { }
@@ -103,6 +103,22 @@ namespace VecMath
                 z = -norm * q1.z
             };
         }
+
+        public static Quaternion Add(Quaternion q1, Quaternion q2) => new Quaternion()
+        {
+            w = q1.w + q2.w,
+            x = q1.x + q2.x,
+            y = q1.y + q2.y,
+            z = q1.z + q2.z,
+        };
+
+        public static Quaternion Mul(Quaternion q1, float f2) => new Quaternion()
+        {
+            w = q1.w * f2,
+            x = q1.x * f2,
+            y = q1.y * f2,
+            z = q1.z * f2,
+        };
 
         public static Quaternion Mul(Quaternion q1, Quaternion q2) => new Quaternion()
         {
@@ -209,7 +225,7 @@ namespace VecMath
             return new Vector3(q2.x, q2.y, q2.z);
         }
 
-        public bool IsNaN() => float.IsNaN(x) || float.IsNaN(y) || float.IsNaN(z) || float.IsNaN(w);
+        public static bool IsNaN(Quaternion q) => float.IsNaN(q.x) || float.IsNaN(q.y) || float.IsNaN(q.z) || float.IsNaN(q.w);
 
         public override bool Equals(object obj)
         {
@@ -257,6 +273,10 @@ namespace VecMath
         public static Quaternion operator -(Quaternion q1) => Conjugate(q1);
 
         public static Quaternion operator ~(Quaternion q1) => Inverse(q1);
+
+        public static Quaternion operator +(Quaternion q1, Quaternion q2) => Add(q1, q2);
+
+        public static Quaternion operator *(Quaternion q1, double d2) => Mul(q1, (float)d2);
 
         public static Quaternion operator *(Quaternion q1, Quaternion q2) => Mul(q1, q2);
 
