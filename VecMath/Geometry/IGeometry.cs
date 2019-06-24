@@ -23,13 +23,13 @@ namespace VecMath.Geometry
 
         public AABoundingBox(Vector3 pos1, Vector3 pos2)
         {
-            PosMin = MathUtil.Min(pos1, pos2);
-            PosMax = MathUtil.Max(pos1, pos2);
+            PosMin = VMath.Min(pos1, pos2);
+            PosMax = VMath.Max(pos1, pos2);
         }
 
         public bool IsIntersectWithPoint(Vector3 pos)
         {
-            return MathUtil.WithIn(pos, PosMin, PosMax);
+            return PosMin.x <= pos.x && pos.x <= PosMin.x && PosMin.y <= pos.y && pos.y <= PosMin.y && PosMin.z <= pos.z && pos.z <= PosMin.z;
         }
 
         public bool IsIntersectWithRay(Ray ray)
@@ -81,6 +81,78 @@ namespace VecMath.Geometry
         }
     }
 
+    public struct Vertex
+    {
+        public Vector3 pos;
+        public Vector3 normal;
+        public Vector2 uv;
+
+        public Vertex(Vector3 pos, Vector3 normal, Vector2 uv)
+        {
+            this.pos = pos;
+            this.normal = normal;
+            this.uv = uv;
+        }
+    }
+
+    public class Polygon : IGeometry
+    {
+        public Vertex V1 { get => vertices[0]; set => vertices[0] = value; }
+        public Vertex V2 { get => vertices[1]; set => vertices[1] = value; }
+        public Vertex V3 { get => vertices[2]; set => vertices[2] = value; }
+        public Vertex[] vertices = new Vertex[3];
+        public Vector3 normal;
+
+        public Polygon()
+        {
+            vertices = new Vertex[3];
+        }
+
+        public Polygon(Vertex[] vertices)
+        {
+            this.vertices = vertices;
+            normal = VMath.Normalize(V1.normal + V2.normal + V3.normal);
+        }
+
+        public Polygon(Vertex v1, Vertex v2, Vertex v3) : this()
+        {
+            V1 = v1;
+            V2 = v2;
+            V3 = v3;
+            normal = VMath.Normalize(v1.normal + v2.normal + v3.normal);
+        }
+
+        public Polygon Copy() => new Polygon(V1, V2, V3);
+
+        public bool IsIntersectWithRay(Ray ray)
+        {
+            var cross1 = VMath.Cross(V2.pos - V1.pos, ray.pos - V1.pos);
+            var dot1 = VMath.Dot(cross1, ray.vec);
+
+            var cross2 = VMath.Cross(V3.pos - V2.pos, ray.pos - V2.pos);
+            var dot2 = VMath.Dot(cross2, ray.vec);
+
+            if (dot1 > 0 ^ dot2 > 0)
+            {
+                return false;
+            }
+
+            var cross3 = VMath.Cross(V1.pos - V3.pos, ray.pos - V3.pos);
+            var dot3 = VMath.Dot(cross3, ray.vec);
+
+            return !(dot2 > 0 ^ dot3 > 0);
+        }
+
+        public float CalculateTimeToIntersectWithRay(Ray ray)
+        {
+            float dot = VMath.Dot(normal, ray.vec);
+
+            if (Math.Abs(dot) <= 1E-6) return 1E+6F;
+
+            return VMath.Dot(normal, V1.pos - ray.pos) / dot;
+        }
+    }
+
     public struct Triangle : IGeometry
     {
         public Vector3 Pos1 { get; }
@@ -93,35 +165,35 @@ namespace VecMath.Geometry
             Pos1 = pos1;
             Pos2 = pos2;
             Pos3 = pos3;
-            Normal = MathUtil.Cross(Pos3 - Pos1, Pos2 - Pos1);
+            Normal = VMath.Cross(Pos3 - Pos1, Pos2 - Pos1);
         }
 
         public bool IsIntersectWithRay(Ray ray)
         {
-            var cross1 = MathUtil.Cross(Pos2 - Pos1, ray.pos - Pos1);
-            var dot1 = MathUtil.Dot(cross1, ray.vec);
+            var cross1 = VMath.Cross(Pos2 - Pos1, ray.pos - Pos1);
+            var dot1 = VMath.Dot(cross1, ray.vec);
 
-            var cross2 = MathUtil.Cross(Pos3 - Pos2, ray.pos - Pos2);
-            var dot2 = MathUtil.Dot(cross2, ray.vec);
+            var cross2 = VMath.Cross(Pos3 - Pos2, ray.pos - Pos2);
+            var dot2 = VMath.Dot(cross2, ray.vec);
 
             if (dot1 > 0 ^ dot2 > 0)
             {
                 return false;
             }
 
-            var cross3 = MathUtil.Cross(Pos1 - Pos3, ray.pos - Pos3);
-            var dot3 = MathUtil.Dot(cross3, ray.vec);
+            var cross3 = VMath.Cross(Pos1 - Pos3, ray.pos - Pos3);
+            var dot3 = VMath.Dot(cross3, ray.vec);
 
             return !(dot2 > 0 ^ dot3 > 0);
         }
 
         public float CalculateTimeToIntersectWithRay(Ray ray)
         {
-            float dot = MathUtil.Dot(Normal, ray.vec);
+            float dot = VMath.Dot(Normal, ray.vec);
 
             if (Math.Abs(dot) <= 1E-6) return 1E+6F;
 
-            return MathUtil.Dot(Normal, Pos1 - ray.pos) / dot;
+            return VMath.Dot(Normal, Pos1 - ray.pos) / dot;
         }
     }
 
@@ -138,33 +210,16 @@ namespace VecMath.Geometry
 
         public bool IsIntersectWithRay(Ray ray)
         {
-            return Math.Abs(MathUtil.Dot(Normal, ray.vec)) > 1E-6;
+            return Math.Abs(VMath.Dot(Normal, ray.vec)) > 1E-6;
         }
 
         public float CalculateTimeToIntersectWithRay(Ray ray)
         {
-            float dot = MathUtil.Dot(Normal, ray.vec);
+            float dot = VMath.Dot(Normal, ray.vec);
 
             if (Math.Abs(dot) <= 1E-6) return 1E+6F;
 
-            return MathUtil.Dot(Normal, Pos - ray.pos) / dot;
-        }
-    }
-
-    public struct Disk : IGeometry
-    {
-        public Vector3 Pos { get; set; }
-        public Vector3 Normal { get; set; }
-        public float Range { get; set; }
-
-        public float CalculateTimeToIntersectWithRay(Ray ray)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsIntersectWithRay(Ray ray)
-        {
-            throw new NotImplementedException();
+            return VMath.Dot(Normal, Pos - ray.pos) / dot;
         }
     }
 
@@ -182,7 +237,7 @@ namespace VecMath.Geometry
         public float CalculateTimeToIntersectWithRay(Ray ray)
         {
             float a0 = ray.vec.LengthSquare();
-            float a1 = MathUtil.Dot(ray.vec, Pos - ray.pos);
+            float a1 = VMath.Dot(ray.vec, Pos - ray.pos);
             float a2 = (Pos - ray.pos).LengthSquare() - Range * Range;
 
             float d = a1 * a1 - a0 * a2;
@@ -204,7 +259,7 @@ namespace VecMath.Geometry
         public bool IsIntersectWithRay(Ray ray)
         {
             var target = Pos - ray.pos;
-            float time = MathUtil.Dot(MathUtil.Normalize(ray.vec), target);
+            float time = VMath.Dot(VMath.Normalize(ray.vec), target);
 
             if (time <= 0) return false;
 

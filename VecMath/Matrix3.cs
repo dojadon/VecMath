@@ -135,7 +135,7 @@ namespace VecMath
         {
             if (normalize)
             {
-                axis = MathUtil.Normalize(axis);
+                axis = VMath.Normalize(axis);
             }
 
             float cos = (float)Math.Cos(angle);
@@ -143,15 +143,15 @@ namespace VecMath
 
             var x = Vector3.UnitX;
             var n = axis.x * axis;
-            x = cos * (x - n) + sin * MathUtil.Cross(axis, x) + n;
+            x = cos * (x - n) + sin * VMath.Cross(axis, x) + n;
 
             var y = Vector3.UnitY;
             n = axis.y * axis;
-            y = cos * (y - n) + sin * MathUtil.Cross(axis, y) + n;
+            y = cos * (y - n) + sin * VMath.Cross(axis, y) + n;
 
             var z = Vector3.UnitZ;
             n = axis.z * axis;
-            z = cos * (z - n) + sin * MathUtil.Cross(axis, z) + n;
+            z = cos * (z - n) + sin * VMath.Cross(axis, z) + n;
 
             return new Matrix3(x, y, z);
         }
@@ -184,9 +184,9 @@ namespace VecMath
         {
             if (forward == upward || forward == -upward) return Identity;
 
-            var z = -MathUtil.Normalize(forward);
-            var x = MathUtil.Normalize(MathUtil.Cross(upward, z));
-            var y = MathUtil.Normalize(MathUtil.Cross(z, x));
+            var z = VMath.Normalize(forward);
+            var x = VMath.Normalize(VMath.Cross(upward, z));
+            var y = VMath.Normalize(VMath.Cross(z, x));
 
             return new Matrix3(x, y, z);
         }

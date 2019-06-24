@@ -96,7 +96,7 @@ namespace VecMath
             float dot = Dot(v1, v2);
             float t1, t2;
 
-            if (1.0F - dot > MathUtil.EPS)
+            if (1.0F - dot > VMath.EPS)
             {
                 float angle = (float)Math.Acos(dot);
                 float sin = (float)Math.Sin(angle);

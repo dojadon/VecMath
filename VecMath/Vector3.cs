@@ -141,7 +141,7 @@ namespace VecMath
             float dot = Dot(v1, v2);
             float t1, t2;
 
-            if (1.0F - dot > MathUtil.EPS)
+            if (1.0F - dot > VMath.EPS)
             {
                 float angle = (float)Math.Acos(dot);
                 float sin = (float)Math.Sin(angle);
@@ -217,6 +217,8 @@ namespace VecMath
         public static Vector3 operator *(Vector3 v1, double d1) => Scale(v1, (float)d1);
 
         public static Vector3 operator *(double d1, Vector3 v1) => Scale(v1, (float)d1);
+
+        public static Vector3 operator /(Vector3 v1, double d1) => Scale(v1, 1 / (float)d1);
 
         public static explicit operator Vector4(Vector3 v1) => new Vector4(v1.x, v1.y, v1.z, 1);
 

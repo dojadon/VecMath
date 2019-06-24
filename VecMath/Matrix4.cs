@@ -194,33 +194,33 @@ namespace VecMath
 
         public static Matrix4 RotationAxis(Vector3 axis, float angle, Vector3 trans)
         {
-            axis = MathUtil.Normalize(axis);
+            axis = VMath.Normalize(axis);
 
             float cos = (float)Math.Cos(angle);
             float sin = (float)Math.Sin(angle);
 
             var x = Vector3.UnitX;
             var n = axis.x * axis;
-            x = cos * (x - n) + sin * MathUtil.Cross(axis, x) + n;
+            x = cos * (x - n) + sin * VMath.Cross(axis, x) + n;
 
             var y = Vector3.UnitY;
             n = axis.y * axis;
-            y = cos * (y - n) + sin * MathUtil.Cross(axis, y) + n;
+            y = cos * (y - n) + sin * VMath.Cross(axis, y) + n;
 
             var z = Vector3.UnitZ;
             n = axis.z * axis;
-            z = cos * (z - n) + sin * MathUtil.Cross(axis, z) + n;
+            z = cos * (z - n) + sin * VMath.Cross(axis, z) + n;
 
             return new Matrix4(x, y, z, trans);
         }
 
         public static Matrix4 LookAt(Vector3 center, Vector3 eye, Vector3 upward)
         {
-            var z = MathUtil.Normalize(eye - center);
-            var x = MathUtil.Normalize(MathUtil.Cross(upward, z));
-            var y = MathUtil.Normalize(MathUtil.Cross(z, x));
+            var z = VMath.Normalize(eye - center);
+            var x = VMath.Normalize(VMath.Cross(upward, z));
+            var y = VMath.Normalize(VMath.Cross(z, x));
 
-            return new Matrix4(x, y, z, new Vector3(-MathUtil.Dot(x, eye), -MathUtil.Dot(y, eye), -MathUtil.Dot(z, eye)));
+            return new Matrix4(x, y, z, new Vector3(-VMath.Dot(x, eye), -VMath.Dot(y, eye), -VMath.Dot(z, eye)));
         }
 
         public static Matrix4 Perspective(float width, float height, float zNear, float zFar, float fovy)
